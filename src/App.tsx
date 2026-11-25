@@ -40,7 +40,8 @@ export default function App() {
   const [notice, setNotice] = useState("Welcome back, Director. Your empire kept working.");
   const [rushActive, setRushActive] = useState(false);
 
-  const production = save.mineLevel * 3 + save.robotLevel * 5 + save.researchLevel * 2;
+  const baseProduction = save.mineLevel * 3 + save.robotLevel * 5 + save.researchLevel * 2;
+  const production = baseProduction * (rushActive ? 2 : 1);
   const energyCap = 100 + save.powerLevel * 20;
   const tapReward = save.tapPower * 5 + save.researchLevel;
   const upgrades = [
@@ -55,7 +56,7 @@ export default function App() {
     const timer = window.setInterval(() => {
       setSave((current) => ({
         ...current,
-        coins: current.coins + current.mineLevel * 3 + current.robotLevel * 5 + current.researchLevel * 2,
+        coins: current.coins + (current.mineLevel * 3 + current.robotLevel * 5 + current.researchLevel * 2) * (rushActive ? 2 : 1),
         energy: Math.min(100 + current.powerLevel * 20, current.energy + 1 + current.powerLevel),
         lastSeen: Date.now(),
       }));
