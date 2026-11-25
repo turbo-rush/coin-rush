@@ -1,44 +1,62 @@
 import { useEffect, useMemo, useState } from "react";
 
 type Tab = "empire" | "battle" | "ranking" | "social";
-type Save = { coins: number; energy: number; mineLevel: number; tapPower: number; lastSeen: number };
+type Save = {
+  coins: number; energy: number; mineLevel: number; tapPower: number;
+  robotLevel: number; researchLevel: number; powerLevel: number;
+  totalMined: number; lastSeen: number;
+};
 
 const SAVE_KEY = "coin-rush-mvp-v1";
-const defaults: Save = { coins: 250, energy: 100, mineLevel: 1, tapPower: 1, lastSeen: Date.now() };
+const defaults: Save = {
+  coins: 250, energy: 100, mineLevel: 1, tapPower: 1,
+  robotLevel: 0, researchLevel: 0, powerLevel: 0, totalMined: 0, lastSeen: Date.now()
+};
 
-const upgrades = [
-  { id: "mine", name: "Gold Mine", detail: "Increase passive production", icon: "⛏️", base: 100 },
-  { id: "drill", name: "Turbo Drill", detail: "Earn more with every tap", icon: "⚙️", base: 150 },
-];
+const fmt = (value: number) => Math.floor(value).toLocaleString("en-US");
+const costFor = (base: number, level: number, growth: number) => Math.floor(base * Math.pow(growth, level));
 
 function readSave(): Save {
   try {
     const raw = localStorage.getItem(SAVE_KEY);
     if (!raw) return defaults;
-    const parsed = JSON.parse(raw) as Partial<Save>;
-    return { ...defaults, ...parsed, lastSeen: Date.now() };
+    const parsed = { ...defaults, ...(JSON.parse(raw) as Partial<Save>) };
+    const awaySeconds = Math.min(8 * 60 * 60, Math.max(0, Math.floor((Date.now() - parsed.lastSeen) / 1000)));
+    const offlineRate = parsed.mineLevel * 3 + parsed.robotLevel * 5 + parsed.researchLevel * 2;
+    return {
+      ...parsed,
+      coins: parsed.coins + offlineRate * awaySeconds,
+      energy: Math.min(100 + parsed.powerLevel * 20, parsed.energy + awaySeconds * (1 + parsed.powerLevel)),
+      lastSeen: Date.now()
+    };
   } catch {
     return defaults;
   }
 }
 
-const fmt = (value: number) => Math.floor(value).toLocaleString("en-US");
-
 export default function App() {
   const [tab, setTab] = useState<Tab>("empire");
   const [save, setSave] = useState<Save>(readSave);
-  const [notice, setNotice] = useState("Your mining empire is ready.");
+  const [notice, setNotice] = useState("Welcome back, Director. Your empire kept working.");
+  const [rushActive, setRushActive] = useState(false);
 
-  const production = save.mineLevel * 3;
-  const nextMineCost = Math.floor(100 * Math.pow(1.55, save.mineLevel - 1));
-  const nextDrillCost = Math.floor(150 * Math.pow(1.7, save.tapPower - 1));
+  const production = save.mineLevel * 3 + save.robotLevel * 5 + save.researchLevel * 2;
+  const energyCap = 100 + save.powerLevel * 20;
+  const tapReward = save.tapPower * 5 + save.researchLevel;
+  const upgrades = [
+    { id: "mine", name: "Gold Mine", detail: "Increase core coin production", icon: "⛏️", level: save.mineLevel, cost: costFor(100, save.mineLevel - 1, 1.55) },
+    { id: "drill", name: "Turbo Drill", detail: "Earn more coins per manual tap", icon: "⚙️", level: save.tapPower, cost: costFor(150, save.tapPower - 1, 1.7) },
+    { id: "robots", name: "Robot Crew", detail: "Automate mining operations", icon: "🤖", level: save.robotLevel, cost: costFor(220, save.robotLevel, 1.8) },
+    { id: "research", name: "Research Lab", detail: "Improve all production systems", icon: "🔬", level: save.researchLevel, cost: costFor(350, save.researchLevel, 2) },
+    { id: "power", name: "Power Plant", detail: "Expand energy capacity and recovery", icon: "⚡", level: save.powerLevel, cost: costFor(180, save.powerLevel, 1.75) },
+  ];
 
   useEffect(() => {
     const timer = window.setInterval(() => {
       setSave((current) => ({
         ...current,
-        coins: current.coins + current.mineLevel * 3,
-        energy: Math.min(100, current.energy + 1),
+        coins: current.coins + current.mineLevel * 3 + current.robotLevel * 5 + current.researchLevel * 2,
+        energy: Math.min(100 + current.powerLevel * 20, current.energy + 1 + current.powerLevel),
         lastSeen: Date.now(),
       }));
     }, 1000);
@@ -49,34 +67,49 @@ export default function App() {
     localStorage.setItem(SAVE_KEY, JSON.stringify(save));
   }, [save]);
 
-  const progress = useMemo(() => Math.max(0, Math.min(100, save.energy)), [save.energy]);
+  const energyProgress = useMemo(() => Math.max(0, Math.min(100, save.energy / energyCap * 100)), [save.energy, energyCap]);
 
   function mine() {
-    if (save.energy < 1) {
-      setNotice("Energy is recharging. Come back in a moment.");
+    if (save.energy < 2) {
+      setNotice("Not enough Rush Energy. Your power plant is recharging.");
       return;
     }
     setSave((current) => ({
       ...current,
-      coins: current.coins + current.tapPower * 5,
+      coins: current.coins + current.tapPower * 5 + current.researchLevel,
+      totalMined: current.totalMined + current.tapPower * 5 + current.researchLevel,
       energy: Math.max(0, current.energy - 2),
     }));
-    setNotice(`+${save.tapPower * 5} coins mined!`);
+    setNotice(`+${tapReward} coins mined!`);
   }
 
   function buyUpgrade(id: string) {
-    const cost = id === "mine" ? nextMineCost : nextDrillCost;
-    if (save.coins < cost) {
+    const item = upgrades.find((upgrade) => upgrade.id === id);
+    if (!item || save.coins < item.cost) {
       setNotice("Not enough coins yet. Keep mining!");
       return;
     }
     setSave((current) => ({
       ...current,
-      coins: current.coins - cost,
+      coins: current.coins - item.cost,
       mineLevel: id === "mine" ? current.mineLevel + 1 : current.mineLevel,
       tapPower: id === "drill" ? current.tapPower + 1 : current.tapPower,
+      robotLevel: id === "robots" ? current.robotLevel + 1 : current.robotLevel,
+      researchLevel: id === "research" ? current.researchLevel + 1 : current.researchLevel,
+      powerLevel: id === "power" ? current.powerLevel + 1 : current.powerLevel,
     }));
-    setNotice(id === "mine" ? "Gold Mine upgraded!" : "Turbo Drill upgraded!");
+    setNotice(`${item.name} upgraded to level ${item.level + 1}!`);
+  }
+
+  function activateRush() {
+    if (save.energy < 25 || rushActive) {
+      setNotice(rushActive ? "Rush Overdrive is already active." : "You need 25 energy to activate Overdrive.");
+      return;
+    }
+    setSave((current) => ({ ...current, energy: current.energy - 25 }));
+    setRushActive(true);
+    setNotice("RUSH OVERDRIVE activated — double production for 20 seconds!");
+    window.setTimeout(() => setRushActive(false), 20000);
   }
 
   const tabs: { id: Tab; icon: string; label: string }[] = [
@@ -89,90 +122,37 @@ export default function App() {
   return (
     <main className="app-shell">
       <header className="topbar">
-        <div className="brand-lockup">
-          <div className="brand-mark">CR</div>
-          <div><p className="eyebrow">BUILD • UPGRADE • DOMINATE</p><h1>COIN <span>RUSH</span></h1></div>
-        </div>
+        <div className="brand-lockup"><div className="brand-mark">CR</div><div><p className="eyebrow">BUILD • UPGRADE • DOMINATE</p><h1>COIN <span>RUSH</span></h1></div></div>
         <button className="avatar-button" onClick={() => setTab("social")} aria-label="Open profile">👤</button>
       </header>
 
-      <section className="player-strip">
-        <div><span className="online-dot" /> CORPORATION <strong>ROOKIE MINERS</strong></div>
-        <div className="level-pill">LVL {save.mineLevel}</div>
-      </section>
+      <section className="player-strip"><div><span className="online-dot" /> CORPORATION <strong>ROOKIE MINERS</strong></div><div className="level-pill">LVL {save.mineLevel}</div></section>
 
       <section className="wallet-grid">
-        <div className="wallet-card coin-wallet">
-          <span className="wallet-label">COIN BALANCE</span>
-          <strong>◈ {fmt(save.coins)}</strong>
-          <small>+{production} / SEC</small>
-        </div>
-        <div className="wallet-card energy-wallet">
-          <span className="wallet-label">RUSH ENERGY</span>
-          <strong>⚡ {fmt(save.energy)}<small className="out-of"> / 100</small></strong>
-          <div className="energy-track"><div className="energy-fill" style={{ width: `${progress}%` }} /></div>
-        </div>
+        <div className="wallet-card coin-wallet"><span className="wallet-label">COIN BALANCE</span><strong>◈ {fmt(save.coins)}</strong><small>+{production} / SEC</small></div>
+        <div className="wallet-card energy-wallet"><span className="wallet-label">RUSH ENERGY</span><strong>⚡ {fmt(save.energy)}<small className="out-of"> / {energyCap}</small></strong><div className="energy-track"><div className="energy-fill" style={{ width: `${energyProgress}%` }} /></div></div>
       </section>
 
-      {tab === "empire" && (
-        <>
-          <section className="hero-panel">
-            <div className="hero-glow" />
-            <div className="hero-copy"><span className="section-kicker">YOUR HEADQUARTERS</span><h2>Gold Mine <em>01</em></h2><p>Your empire works even when you are away.</p></div>
-            <div className="mine-art" aria-hidden="true"><div className="ore-ring" /><div className="ore-core">◆</div><span className="spark spark-one">✦</span><span className="spark spark-two">✧</span><span className="mine-crate">▰</span></div>
-            <div className="production-line"><span>PRODUCTION RATE</span><strong>+{production} <small>COINS / SEC</small></strong></div>
-          </section>
+      {tab === "empire" && <>
+        <section className="hero-panel"><div className="hero-glow" /><div className="hero-copy"><span className="section-kicker">YOUR HEADQUARTERS</span><h2>Gold Mine <em>01</em></h2><p>Your empire works even when you are away.</p></div><div className="mine-art" aria-hidden="true"><div className="ore-ring" /><div className="ore-core">◆</div><span className="spark spark-one">✦</span><span className="spark spark-two">✧</span><span className="mine-crate">▰</span></div><div className="production-line"><span>PRODUCTION RATE</span><strong>+{production} <small>COINS / SEC</small></strong></div></section>
 
-          <section className="section-heading"><div><span className="section-kicker">GROW YOUR POWER</span><h2>Upgrade your empire</h2></div><span className="tiny-tag">2 UPGRADES</span></section>
-          <section className="upgrade-list">
-            {upgrades.map((item) => {
-              const level = item.id === "mine" ? save.mineLevel : save.tapPower;
-              const cost = item.id === "mine" ? nextMineCost : nextDrillCost;
-              return <article className="upgrade-card" key={item.id}>
-                <div className="upgrade-icon">{item.icon}</div>
-                <div className="upgrade-info"><h3>{item.name}</h3><p>{item.detail}</p><span>LEVEL {level}</span></div>
-                <button className="buy-button" onClick={() => buyUpgrade(item.id)} disabled={save.coins < cost}><strong>◈ {fmt(cost)}</strong><small>UPGRADE</small></button>
-              </article>;
-            })}
-          </section>
+        <section className="rush-panel"><div><span className="section-kicker">SIGNATURE ABILITY</span><h2>Rush Overdrive</h2><p>{rushActive ? "Overdrive is active! Production boost engaged." : "Spend 25 energy to double your mining output for 20 seconds."}</p></div><button className={rushActive ? "rush-button active-rush" : "rush-button"} onClick={activateRush} disabled={rushActive}>⚡ {rushActive ? "ACTIVE" : "ACTIVATE"}</button></section>
 
-          <section className="mine-action">
-            <div><span className="section-kicker">MANUAL MINING</span><h2>Boost your output</h2><p>Tap to mine extra coins. Each tap uses 2 energy.</p></div>
-            <button className="mine-button" onClick={mine}><span>◈</span><strong>RUSH MINE</strong><small>+{save.tapPower * 5} COINS</small></button>
-          </section>
-        </>
-      )}
+        <section className="section-heading"><div><span className="section-kicker">GROW YOUR POWER</span><h2>Upgrade your empire</h2></div><span className="tiny-tag">5 SYSTEMS</span></section>
+        <section className="upgrade-list">{upgrades.map((item) => <article className="upgrade-card" key={item.id}><div className="upgrade-icon">{item.icon}</div><div className="upgrade-info"><h3>{item.name}</h3><p>{item.detail}</p><span>LEVEL {item.level}</span></div><button className="buy-button" onClick={() => buyUpgrade(item.id)} disabled={save.coins < item.cost}><strong>◈ {fmt(item.cost)}</strong><small>UPGRADE</small></button></article>)}</section>
 
-      {tab === "battle" && (
-        <section className="feature-page">
-          <div className="feature-art battle-art">⚔️</div><span className="section-kicker">COMPETE FOR GLORY</span><h2>Enter the arena</h2>
-          <p>Challenge other corporations in quick Gold Duels. Your mine level and upgrades will shape your strength.</p>
-          <div className="mode-card"><div className="mode-icon">⚔️</div><div><h3>Gold Duel</h3><p>1 vs 1 • Competitive match</p></div><span className="coming-tag">NEXT STAGE</span></div>
-          <div className="mode-card"><div className="mode-icon">🌟</div><div><h3>Gold Rush</h3><p>Massive resource race</p></div><span className="coming-tag">NEXT STAGE</span></div>
-          <div className="notice-card">Matchmaking and live PvP will be connected to the game server in the next development stage. No simulated opponents are presented as real players.</div>
-        </section>
-      )}
+        <section className="mine-action"><div><span className="section-kicker">MANUAL MINING</span><h2>Boost your output</h2><p>Tap to mine extra coins. Each tap uses 2 energy.</p></div><button className="mine-button" onClick={mine}><span>◈</span><strong>RUSH MINE</strong><small>+{tapReward} COINS</small></button></section>
+        <section className="stats-strip"><div><span>TOTAL MINED</span><strong>{fmt(save.totalMined)}</strong></div><div><span>ROBOT CREW</span><strong>LVL {save.robotLevel}</strong></div><div><span>RESEARCH</span><strong>LVL {save.researchLevel}</strong></div></section>
+      </>}
 
-      {tab === "ranking" && (
-        <section className="feature-page">
-          <div className="feature-art trophy-art">🏆</div><span className="section-kicker">SEASON ZERO</span><h2>Global ranking</h2><p>Build your empire, win matches and climb the competitive ladder.</p>
-          <div className="rank-preview"><span>YOUR CURRENT LEAGUE</span><strong>🥉 BRONZE</strong><small>Season rankings unlock with server profiles.</small></div>
-          <div className="rank-row"><span>01</span><b>Top corporations</b><strong>—</strong></div><div className="rank-row"><span>02</span><b>Weekly champions</b><strong>—</strong></div><div className="rank-row"><span>03</span><b>Rising miners</b><strong>—</strong></div>
-        </section>
-      )}
+      {tab === "battle" && <section className="feature-page"><div className="feature-art battle-art">⚔️</div><span className="section-kicker">COMPETE FOR GLORY</span><h2>Enter the arena</h2><p>Your upgrades shape your competitive power. Build your corporation before entering the ranked arena.</p><div className="mode-card"><div className="mode-icon">⚔️</div><div><h3>Gold Duel</h3><p>1 vs 1 • Competitive match</p></div><span className="coming-tag">NEXT STAGE</span></div><div className="mode-card"><div className="mode-icon">🌟</div><div><h3>Gold Rush</h3><p>Massive resource race</p></div><span className="coming-tag">NEXT STAGE</span></div><div className="notice-card">Live matchmaking will be connected to the game server in the next stage. We will not present simulated opponents as real players.</div></section>}
 
-      {tab === "social" && (
-        <section className="feature-page">
-          <div className="feature-art social-art">👥</div><span className="section-kicker">BUILD YOUR CREW</span><h2>Find your people</h2><p>Invite friends, form a corporation and compete together for control of the richest mines.</p>
-          <div className="mode-card"><div className="mode-icon">🛡️</div><div><h3>Corporations</h3><p>Team up and climb clan rankings</p></div><span className="coming-tag">NEXT STAGE</span></div>
-          <div className="mode-card"><div className="mode-icon">🎁</div><div><h3>Invite friends</h3><p>Referral rewards and crew bonuses</p></div><span className="coming-tag">NEXT STAGE</span></div>
-        </section>
-      )}
+      {tab === "ranking" && <section className="feature-page"><div className="feature-art trophy-art">🏆</div><span className="section-kicker">SEASON ZERO</span><h2>Global ranking</h2><p>Build your empire, win matches and climb the competitive ladder.</p><div className="rank-preview"><span>YOUR CURRENT LEAGUE</span><strong>🥉 BRONZE</strong><small>Global rankings unlock with server profiles.</small></div><div className="rank-row"><span>01</span><b>Top corporations</b><strong>—</strong></div><div className="rank-row"><span>02</span><b>Weekly champions</b><strong>—</strong></div><div className="rank-row"><span>03</span><b>Rising miners</b><strong>—</strong></div></section>}
+
+      {tab === "social" && <section className="feature-page"><div className="feature-art social-art">👥</div><span className="section-kicker">BUILD YOUR CREW</span><h2>Find your people</h2><p>Invite friends, form a corporation and compete together for control of the richest mines.</p><div className="mode-card"><div className="mode-icon">🛡️</div><div><h3>Corporations</h3><p>Team up and climb clan rankings</p></div><span className="coming-tag">NEXT STAGE</span></div><div className="mode-card"><div className="mode-icon">🎁</div><div><h3>Invite friends</h3><p>Referral rewards and crew bonuses</p></div><span className="coming-tag">NEXT STAGE</span></div></section>}
 
       <div className="toast" role="status">{notice}</div>
-      <nav className="bottom-nav" aria-label="Main navigation">
-        {tabs.map((item) => <button key={item.id} className={tab === item.id ? "nav-item active" : "nav-item"} onClick={() => setTab(item.id)}><span>{item.icon}</span><small>{item.label}</small></button>)}
-      </nav>
+      <nav className="bottom-nav" aria-label="Main navigation">{tabs.map((item) => <button key={item.id} className={tab === item.id ? "nav-item active" : "nav-item"} onClick={() => setTab(item.id)}><span>{item.icon}</span><small>{item.label}</small></button>)}</nav>
     </main>
   );
 }
