@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { supabase } from "./lib/supabase";
 
 type Tab = "empire" | "battle" | "ranking" | "social";
 type Save = {
@@ -39,6 +40,7 @@ export default function App() {
   const [save, setSave] = useState<Save>(readSave);
   const [notice, setNotice] = useState("Welcome back, Director. Your empire kept working.");
   const [rushActive, setRushActive] = useState(false);
+  const [authStatus, setAuthStatus] = useState<"connecting" | "online" | "offline" | "error">("connecting");
 
   const baseProduction = save.mineLevel * 3 + save.robotLevel * 5 + save.researchLevel * 2;
   const production = baseProduction * (rushActive ? 2 : 1);
@@ -51,6 +53,41 @@ export default function App() {
     { id: "research", name: "Research Lab", detail: "Improve all production systems", icon: "🔬", level: save.researchLevel, cost: costFor(350, save.researchLevel, 2) },
     { id: "power", name: "Power Plant", detail: "Expand energy capacity and recovery", icon: "⚡", level: save.powerLevel, cost: costFor(180, save.powerLevel, 1.75) },
   ];
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function connectPlayer() {
+      if (!supabase) {
+        setAuthStatus("offline");
+        return;
+      }
+
+      try {
+        const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+        if (sessionError) throw sessionError;
+
+        if (!sessionData.session) {
+          const { error: signInError } = await supabase.auth.signInAnonymously();
+          if (signInError) throw signInError;
+        }
+
+        if (!cancelled) {
+          setAuthStatus("online");
+          setNotice("Player profile connected. Welcome to COIN RUSH!");
+        }
+      } catch (error) {
+        console.error("Supabase player sign-in failed:", error);
+        if (!cancelled) {
+          setAuthStatus("error");
+          setNotice("Online profile unavailable. Your local empire is still playable.");
+        }
+      }
+    }
+
+    void connectPlayer();
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -127,7 +164,7 @@ export default function App() {
         <button className="avatar-button" onClick={() => setTab("social")} aria-label="Open profile">👤</button>
       </header>
 
-      <section className="player-strip"><div><span className="online-dot" /> CORPORATION <strong>ROOKIE MINERS</strong></div><div className="level-pill">LVL {save.mineLevel}</div></section>
+      <section className="player-strip"><div><span className="online-dot" /> CORPORATION <strong>ROOKIE MINERS</strong><small className="connection-status"> · {authStatus === "online" ? "ONLINE PROFILE" : authStatus === "connecting" ? "CONNECTING..." : authStatus === "error" ? "OFFLINE MODE" : "LOCAL MODE"}</small></div><div className="level-pill">LVL {save.mineLevel}</div></section>
 
       <section className="wallet-grid">
         <div className="wallet-card coin-wallet"><span className="wallet-label">COIN BALANCE</span><strong>◈ {fmt(save.coins)}</strong><small>+{production} / SEC</small></div>
