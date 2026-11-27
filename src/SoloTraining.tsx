@@ -15,12 +15,13 @@ export default function SoloTraining() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    if (!session || session.result !== "playing" || session.mode !== "ai") return;
+    if (!session || session.result !== "playing") return;
     const timer = window.setInterval(() => {
       setSession((current) => {
         if (!current || current.result !== "playing") return current;
         const next = { ...current, player: { ...current.player, energy: clamp(current.player.energy + 2, 0, 100), ultimate: clamp(current.player.ultimate + 0.4, 0, 100) }, enemy: { ...current.enemy, energy: clamp(current.enemy.energy + (difficulty === "hard" ? 5 : difficulty === "normal" ? 4 : 3), 0, 100), ultimate: clamp(current.enemy.ultimate + (difficulty === "hard" ? 0.7 : 0.5), 0, 100) }, log: [...current.log] };
-        next.seconds = Math.max(0, current.seconds - 1);
+        next.seconds = current.mode === "ai" ? Math.max(0, current.seconds - 1) : current.seconds;
+        if (current.mode === "practice") return next;
         const enemy = next.enemy;
         const now = 300 - next.seconds;
         let action = "";
