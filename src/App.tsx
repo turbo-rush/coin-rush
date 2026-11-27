@@ -99,13 +99,14 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (tab !== "ranking" || authStatus !== "online" || !supabase) return;
+    const client = supabase;
+    if (tab !== "ranking" || authStatus !== "online" || !client) return;
     let cancelled = false;
 
     async function loadLeaderboard() {
       setLeaderboardLoading(true);
       setLeaderboardError("");
-      const { data, error } = await supabase
+      const { data, error } = await client
         .from("profiles")
         .select("id, username, rating, wins, losses")
         .order("rating", { ascending: false })
