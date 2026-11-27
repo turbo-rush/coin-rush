@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./lib/supabase";
+import KingdomScene from "./KingdomScene";
 
 type MatchmakingProps = {
   authStatus: "connecting" | "online" | "offline" | "error";
@@ -164,12 +165,12 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
 
   const eventLabel = (event: string) => {
     const labels: Record<string, string> = {
-      match_started: "⚔️ Battle started",
-      mine: "⛏️ Mining operation",
-      emp_strike: "⚡ EMP Strike",
-      golden_shield: "🛡️ Golden Shield activated",
-      robot_raid: "🤖 Robot Raid",
-      ultimate_overdrive: "🔥 Ultimate Overdrive",
+      match_started: "⚔️ The siege has begun",
+      mine: "⛏️ Royal miners gathered gold",
+      emp_strike: "✨ Arcane Bolt",
+      golden_shield: "🛡️ Royal Ward raised",
+      robot_raid: "🐎 Knight Assault",
+      ultimate_overdrive: "🐉 Dragonfire",
       match_completed: "🏆 Match completed",
     };
     return labels[event] || event.replace(/_/g, " ");
@@ -181,10 +182,10 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
 
   return (
     <section className="ranked-arena">
-      <div className="ranked-arena-visual" aria-hidden="true">⚔️</div>
-      <span className="section-kicker">RANKED • SEASON ZERO</span>
-      <h2>Gold Duel</h2>
-      <p>Challenge a real player in a five-minute server-created duel. Opponents are selected by rating and combat power.</p>
+      <KingdomScene variant="battle" />
+      <span className="section-kicker">RANKED • ROYAL WARFARE</span>
+      <h2>War for the Crown</h2>
+      <p>Challenge a real ruler in a five-minute server-controlled siege. Matchmaking balances rating and combat power.</p>
 
       <div className="ranked-spec-grid">
         <div><span>MATCH TYPE</span><strong>1 vs 1</strong></div>
@@ -224,11 +225,11 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
           <p>Your shield: {own?.shield ?? 0} · Enemy shield: {opponent?.shield ?? 0}</p>
           {!completed ? (
             <div className="ranked-battle-actions">
-              <button className="ranked-search-button" onClick={() => void performAction("mine")} disabled={actionLoading}>⛏️ MINE +15 GOLD · 10 ENERGY</button>
-              <button className="ranked-search-button" onClick={() => void performAction("emp_strike")} disabled={actionLoading}>⚡ EMP STRIKE · 35 ENERGY + 25 ULT</button>
-              <button className="ranked-search-button" onClick={() => void performAction("golden_shield")} disabled={actionLoading}>🛡️ GOLDEN SHIELD · 25 ENERGY</button>
-              <button className="ranked-search-button" onClick={() => void performAction("robot_raid")} disabled={actionLoading}>🤖 ROBOT RAID · 40 ENERGY + 20 ULT</button>
-              <button className="ranked-search-button ranked-ultimate-button" onClick={() => void performAction("ultimate")} disabled={actionLoading || (own?.ultimate ?? 0) < 100}>🔥 ULTIMATE OVERDRIVE · 100 CHARGE</button>
+              <button className="ranked-search-button" onClick={() => void performAction("mine")} disabled={actionLoading}>⛏️ GATHER +15 GOLD · 10 ENERGY</button>
+              <button className="ranked-search-button" onClick={() => void performAction("emp_strike")} disabled={actionLoading}>✨ ARCANE BOLT · 35 ENERGY + 25 ULT</button>
+              <button className="ranked-search-button" onClick={() => void performAction("golden_shield")} disabled={actionLoading}>🛡️ ROYAL WARD · 25 ENERGY</button>
+              <button className="ranked-search-button" onClick={() => void performAction("robot_raid")} disabled={actionLoading}>🐎 KNIGHT ASSAULT · 40 ENERGY + 20 ULT</button>
+              <button className="ranked-search-button ranked-ultimate-button" onClick={() => void performAction("ultimate")} disabled={actionLoading || (own?.ultimate ?? 0) < 100}>🐉 DRAGONFIRE · 100 CHARGE</button>
             </div>
           ) : (
             <>
@@ -266,11 +267,11 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
         onClick={startSearch}
         disabled={authStatus !== "online" || searchState === "searching" || searchState === "matched"}
       >
-        {searchState === "searching" ? "SEARCHING..." : searchState === "matched" ? "MATCH CREATED" : searchState === "error" ? "TRY AGAIN" : "FIND RANKED OPPONENT"}
+        {searchState === "searching" ? "SEARCHING..." : searchState === "matched" ? "MATCH CREATED" : searchState === "error" ? "TRY AGAIN" : "FIND AN OPPOSING LORD"}
       </button>
 
       {authStatus !== "online" && <div className="notice-card">Your online profile must be connected to enter Ranked matchmaking.</div>}
-      <div className="notice-card">Ranked combat now includes server-validated mining, EMP, Golden Shield, Robot Raid, Ultimate Overdrive, event history and one-time RP settlement.</div>
+      <div className="notice-card">Royal warfare uses server-validated actions, battle history and one-time RP settlement. Your crown points are settled by the server.</div>
     </section>
   );
 }
