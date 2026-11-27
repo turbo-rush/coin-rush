@@ -149,3 +149,27 @@ body{background:radial-gradient(ellipse at 50% 0%,#4b3824 0%,#211b15 42%,#0d0e0d
 @keyframes impact-pulse{0%,100%{opacity:.45;scale:.85}50%{opacity:1;scale:1.12}}
 @keyframes arrow-volley{0%,12%{opacity:.35;translate:0 0}55%{opacity:1;translate:8px -5px}82%,100%{opacity:.25;translate:13px -8px}}
 @media(prefers-reduced-motion:reduce){.kingdom-scene .scene-soldier,.kingdom-scene .scene-flags,.kingdom-scene .scene-river,.kingdom-scene .scene-impact,.kingdom-scene .scene-projectiles{animation:none!important}}
+
+
+/* Kingdom world motion: make the battlefield visibly alive */
+.kingdom-scene .scene-soldier{transform-box:fill-box;transform-origin:center bottom;will-change:translate,rotate;animation:kingdom-march 2.1s ease-in-out infinite}
+.kingdom-scene .scene-soldier-two{animation-delay:-.65s;animation-duration:2.5s}
+.kingdom-scene .scene-soldier-three{animation-delay:-1.15s;animation-duration:2.2s}
+.kingdom-scene .scene-soldier-four{animation-delay:-.35s;animation-duration:2.7s}
+.kingdom-scene-battle .scene-soldier-one,.kingdom-scene-training .scene-soldier-one{animation-name:kingdom-charge}
+.kingdom-scene-battle .scene-soldier-two,.kingdom-scene-training .scene-soldier-two{animation-name:kingdom-charge;animation-direction:reverse}
+.kingdom-scene-battle .scene-soldier-three,.kingdom-scene-battle .scene-soldier-four{animation-name:kingdom-hold-line}
+.kingdom-scene .scene-projectiles{transform-box:fill-box;transform-origin:center;will-change:translate,opacity;animation:kingdom-arrow-volley 1.65s ease-in-out infinite}
+.kingdom-scene .scene-projectiles path{stroke-dasharray:5 12;animation:kingdom-arrow-dash .65s linear infinite}
+.kingdom-scene .scene-impact{will-change:transform,opacity;animation:kingdom-impact 1.25s ease-in-out infinite}
+.kingdom-scene .scene-flags{will-change:transform;animation:kingdom-wind 1.35s ease-in-out infinite}
+.kingdom-scene .scene-river{stroke-dasharray:18 11;animation:kingdom-river 2.8s linear infinite}
+@keyframes kingdom-march{0%,100%{translate:0 0;rotate:0deg}25%{translate:7px -5px;rotate:2deg}50%{translate:13px 0;rotate:0deg}75%{translate:5px 2px;rotate:-2deg}}
+@keyframes kingdom-charge{0%,100%{translate:0 0}45%{translate:17px -7px}70%{translate:22px 0}}
+@keyframes kingdom-hold-line{0%,100%{translate:0 0}50%{translate:-9px -3px}}
+@keyframes kingdom-arrow-volley{0%,10%{opacity:.15;translate:-18px 12px}45%{opacity:1;translate:8px -5px}75%,100%{opacity:.2;translate:25px -14px}}
+@keyframes kingdom-arrow-dash{to{stroke-dashoffset:-34}}
+@keyframes kingdom-impact{0%,100%{opacity:.25;scale:.65}50%{opacity:1;scale:1.35}}
+@keyframes kingdom-wind{0%,100%{rotate:-4deg}50%{rotate:5deg}}
+@keyframes kingdom-river{to{stroke-dashoffset:-120}}
+@media(prefers-reduced-motion:reduce){.kingdom-scene .scene-soldier,.kingdom-scene .scene-projectiles,.kingdom-scene .scene-impact,.kingdom-scene .scene-flags,.kingdom-scene .scene-river{animation:none!important}}
