@@ -151,7 +151,7 @@ export default function App() {
 
   function mine() {
     if (save.energy < 2) {
-      setNotice("Not enough Rush Energy. Your power plant is recharging.");
+      setNotice("Not enough Rush Energy. The Sun Shrine is restoring your vitality.");
       return;
     }
     setSave((current) => ({
@@ -183,7 +183,7 @@ export default function App() {
 
   function activateRush() {
     if (save.energy < 25 || rushActive) {
-      setNotice(rushActive ? "Rush Overdrive is already active." : "You need 25 energy to activate Overdrive.");
+      setNotice(rushActive ? "Rush Overdrive is already active." : "You need 25 vitality to proclaim a Golden Age.");
       return;
     }
     setSave((current) => ({ ...current, energy: current.energy - 25 }));
