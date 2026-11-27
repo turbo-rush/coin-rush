@@ -21,13 +21,25 @@ type ReadyResult = {
   state_version: number;
 };
 
+type BattleState = {
+  match_status: "active" | "completed" | "cancelled" | "matched";
+  remaining_seconds: number;
+  own_state: { health?: number; energy?: number; ultimate?: number; base_health?: number; gold?: number };
+  opponent_state: { health?: number; energy?: number; ultimate?: number; base_health?: number; gold?: number };
+  state_version: number;
+  winner_id: string | null;
+  last_event: string;
+};
+
 type SearchState = "idle" | "searching" | "matched" | "error";
 
 export default function RankedArena({ authStatus }: MatchmakingProps) {
   const [searchState, setSearchState] = useState<SearchState>("idle");
   const [match, setMatch] = useState<MatchResult | null>(null);
   const [readyState, setReadyState] = useState<ReadyResult | null>(null);
+  const [battleState, setBattleState] = useState<BattleState | null>(null);
   const [readyLoading, setReadyLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   async function checkForMatch() {
@@ -78,14 +90,51 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
     if (result) setReadyState(result);
   }
 
+  async function performAction(action: "sync" | "mine" | "emp_strike") {
+    if (!supabase || !match?.match_id || actionLoading) return;
+    if (action !== "sync") setActionLoading(true);
+    const { data, error } = await supabase.rpc("perform_ranked_action", {
+      p_match_id: match.match_id,
+      p_action: action,
+    });
+    if (action !== "sync") setActionLoading(false);
+    if (error) {
+      if (action !== "sync") setErrorMessage(error.message || "Battle action failed.");
+      return;
+    }
+    const result = (Array.isArray(data) ? data[0] : data) as BattleState | null;
+    if (result) {
+      setBattleState(result);
+      if (result.match_status === "completed" || result.match_status === "cancelled") {
+        setReadyState((previous) => previous ? { ...previous, match_status: result.match_status } : previous);
+      }
+      if (action !== "sync") setErrorMessage("");
+    }
+  }
+
+  const battleStarted = readyState?.match_status === "active" || battleState?.match_status === "active";
+
+  useEffect(() => {
+    if (!battleStarted || !match?.match_id) return;
+    void performAction("sync");
+    const timer = window.setInterval(() => { void performAction("sync"); }, 2000);
+    return () => window.clearInterval(timer);
+  }, [battleStarted, match?.match_id]);
+
   function startSearch() {
     setMatch(null);
     setReadyState(null);
+    setBattleState(null);
     setErrorMessage("");
     void checkForMatch();
   }
 
-  const battleStarted = readyState?.match_status === "active";
+  const formatTime = (seconds: number) =>
+    `${Math.floor(seconds / 60).toString().padStart(2, "0")}:${(seconds % 60).toString().padStart(2, "0")}`;
+
+  const own = battleState?.own_state;
+  const opponent = battleState?.opponent_state;
+  const completed = battleState?.match_status === "completed";
 
   return (
     <section className="ranked-arena">
@@ -112,11 +161,34 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
                 ? "Waiting for the other player to confirm readiness."
                 : "Both players must confirm readiness to start."}</p>
           )}
-          {battleStarted && <p>Server started the five-minute match. Battle actions are the next development step.</p>}
           {!battleStarted && (
             <button className="ranked-search-button" onClick={() => void confirmReady()} disabled={readyLoading}>
-              {readyLoading ? "CONFIRMING..." : readyState?.player_one_ready || readyState?.player_two_ready ? "UPDATE READY STATUS" : "I'M READY"}
+              {readyLoading ? "CONFIRMING..." : "I'M READY"}
             </button>
+          )}
+        </div>
+      )}
+
+      {battleStarted && battleState && (
+        <div className="ranked-match-result" aria-live="polite">
+          <strong>{completed ? "MATCH COMPLETED" : "LIVE BATTLE"}</strong>
+          <div className="ranked-spec-grid">
+            <div><span>TIME LEFT</span><strong>{formatTime(battleState.remaining_seconds)}</strong></div>
+            <div><span>YOUR BASE</span><strong>{own?.base_health ?? 1000}</strong></div>
+            <div><span>ENEMY BASE</span><strong>{opponent?.base_health ?? 1000}</strong></div>
+          </div>
+          <p>Energy: {Math.floor(own?.energy ?? 100)} / 100 · Ultimate: {Math.floor(own?.ultimate ?? 0)} / 100 · Gold: {own?.gold ?? 0}</p>
+          {!completed ? (
+            <div className="ranked-battle-actions">
+              <button className="ranked-search-button" onClick={() => void performAction("mine")} disabled={actionLoading}>
+                {actionLoading ? "PROCESSING..." : "MINE +15 GOLD"}
+              </button>
+              <button className="ranked-search-button" onClick={() => void performAction("emp_strike")} disabled={actionLoading}>
+                EMP STRIKE · 35 ENERGY + 25 ULT
+              </button>
+            </div>
+          ) : (
+            <p>{battleState.winner_id ? battleState.winner_id === match?.opponent_id ? "Opponent wins." : "You win!" : "Draw — equal result."}</p>
           )}
         </div>
       )}
@@ -140,7 +212,7 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
       </button>
 
       {authStatus !== "online" && <div className="notice-card">Your online profile must be connected to enter Ranked matchmaking.</div>}
-      <div className="notice-card">Real-player matchmaking and server-side readiness are live. The server starts the match only after both players confirm. Combat actions are still in development.</div>
+      <div className="notice-card">Ranked matches, readiness, resource regeneration, mining, EMP damage and victory checks are server-authoritative. This is the first playable combat loop; more abilities and defense systems will follow.</div>
     </section>
   );
 }
