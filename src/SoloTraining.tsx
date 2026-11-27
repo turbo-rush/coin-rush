@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import KingdomScene from "./KingdomScene";
 
 type Mode = "menu" | "practice" | "ai";
 type Side = { base: number; energy: number; ultimate: number; gold: number; shield: number; shieldUntil: number; shieldReady: number; empReady: number; raidReady: number };
@@ -109,14 +110,14 @@ export default function SoloTraining() {
   const report = s && s.result !== "playing";
   return (
     <section className="ranked-arena solo-arena">
-      <div className="ranked-arena-visual" aria-hidden="true">🎯</div>
+      <KingdomScene variant="training" />
       <span className="section-kicker">SOLO • TRAINING ARENA</span>
-      <h2>Learn. Adapt. Dominate.</h2>
-      <p>Practice every ability or challenge a tactical AI. Solo simulations never change your Ranked rating, wins or losses.</p>
+      <h2>Train Your Royal Guard.</h2>
+      <p>Sharpen your tactics on the royal training grounds or challenge a rival kingdom. Training never changes Ranked results.</p>
       {mode === "menu" && (
         <>
-          <div className="solo-mode-card"><strong>🎯 FREE PRACTICE</strong><p>Stationary target, unlimited experimentation and instant feedback.</p><button className="ranked-search-button" onClick={() => start("practice")}>START FREE PRACTICE</button></div>
-          <div className="solo-mode-card"><strong>🤖 AI BATTLE</strong><p>A five-minute opponent that mines, manages energy, shields and attacks.</p><label className="solo-difficulty">AI DIFFICULTY <select value={difficulty} onChange={(event) => setDifficulty(event.target.value as typeof difficulty)}><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hard</option></select></label><button className="ranked-search-button" onClick={() => start("ai")}>CHALLENGE AI</button></div>
+          <div className="solo-mode-card"><strong>🏹 ROYAL TRAINING</strong><p>Practice your royal abilities against a training dummy with no Ranked consequences.</p><button className="ranked-search-button" onClick={() => start("practice")}>ENTER TRAINING GROUNDS</button></div>
+          <div className="solo-mode-card"><strong>⚔️ RIVAL KINGDOM</strong><p>A five-minute AI rival that gathers gold, raises wards and launches assaults.</p><label className="solo-difficulty">AI DIFFICULTY <select value={difficulty} onChange={(event) => setDifficulty(event.target.value as typeof difficulty)}><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hard</option></select></label><button className="ranked-search-button" onClick={() => start("ai")}>CHALLENGE THE RIVAL</button></div>
         </>
       )}
       {s && (
@@ -127,31 +128,23 @@ export default function SoloTraining() {
             <div><span>{s.mode === "ai" ? "AI BASE" : "TARGET HP"}</span><strong>{s.enemy.base}</strong></div>
           </div>
           {s.mode === "ai" && <div className="solo-bars"><span>TIME {time}</span><span>AI ENERGY {Math.floor(s.enemy.energy)} · ULT {Math.floor(s.enemy.ultimate)}</span></div>}
-          <div className={`solo-combat-scene ${s.mode === "ai" ? "ai-scene" : "practice-scene"}`}>
-            <div className="solo-scene-base player-base"><span>YOUR BASE</span><strong>{s.player.base} HP</strong><i><b style={{ width: `${s.player.base / 10}%` }} /></i></div>
-            <div className="solo-fighter player-fighter" aria-label="Your battle robot">
-              <span className="fighter-shadow" /><span className="fighter-leg leg-left" /><span className="fighter-leg leg-right" /><span className="fighter-body"><i className="fighter-core" /><i className="fighter-arm arm-left" /><i className="fighter-arm arm-right" /><i className="fighter-head"><b /></i></span><span className="fighter-label">YOU</span>
-            </div>
-            <div className="solo-scene-vs">{s.mode === "ai" ? "VS" : "TARGET"}</div>
-            <div className={`solo-fighter enemy-fighter ${s.mode === "ai" ? "ai-fighter" : "target-fighter"}`} aria-label={s.mode === "ai" ? "AI battle robot" : "Training target"}>
-              <span className="fighter-shadow" /><span className="fighter-leg leg-left" /><span className="fighter-leg leg-right" /><span className="fighter-body"><i className="fighter-core" /><i className="fighter-arm arm-left" /><i className="fighter-arm arm-right" /><i className="fighter-head"><b /></i></span><span className="fighter-label">{s.mode === "ai" ? "TACTICAL AI" : "DUMMY"}</span>
-            </div>
-            <div className="solo-scene-base enemy-base"><span>{s.mode === "ai" ? "AI BASE" : "TARGET"}</span><strong>{s.enemy.base} HP</strong><i><b style={{ width: `${s.enemy.base / 10}%` }} /></i></div>
-            {s.player.shield > 0 && <span className="scene-shield player-shield">🛡️ SHIELD {s.player.shield}</span>}
-            {s.enemy.shield > 0 && <span className="scene-shield enemy-shield">🛡️ SHIELD {s.enemy.shield}</span>}
+          <div className="solo-kingdom-battle">
+            <div className="solo-kingdom-status"><span>♜ YOUR KEEP <b>{s.player.base} HP</b></span><span>{s.mode === "ai" ? "♜ RIVAL KEEP" : "🎯 TRAINING TARGET"} <b>{s.enemy.base} HP</b></span></div>
+            <KingdomScene variant={s.mode === "ai" ? "battle" : "training"} compact />
+            <div className="solo-kingdom-status solo-shield-status"><span>{s.player.shield > 0 ? `🛡 ROYAL WARD ${s.player.shield}` : "YOUR ROYAL GUARD"}</span><span>{s.enemy.shield > 0 ? `🛡 ENEMY WARD ${s.enemy.shield}` : (s.mode === "ai" ? "RIVAL ROYAL GUARD" : "PRACTICE DUMMY")}</span></div>
           </div>
           <p>YOUR ENERGY {Math.floor(s.player.energy)}/100 · ULTIMATE {Math.floor(s.player.ultimate)}/100 · GOLD {s.player.gold} · SHIELD {s.player.shield}</p>
           <div className="ranked-battle-actions">
-            <button className="ranked-search-button" onClick={() => act("mine")} disabled={s.result !== "playing"}>⛏️ MINE +15 GOLD</button>
-            <button className="ranked-search-button" onClick={() => act("emp")} disabled={s.result !== "playing"}>⚡ EMP STRIKE · 120 DMG</button>
-            <button className="ranked-search-button" onClick={() => act("shield")} disabled={s.result !== "playing"}>🛡️ GOLDEN SHIELD</button>
-            <button className="ranked-search-button" onClick={() => act("raid")} disabled={s.result !== "playing"}>🤖 ROBOT RAID · 220 DMG</button>
-            <button className="ranked-search-button ranked-ultimate-button" onClick={() => act("ultimate")} disabled={s.result !== "playing"}>🔥 ULTIMATE · 350 DMG</button>
+            <button className="ranked-search-button" onClick={() => act("mine")} disabled={s.result !== "playing"}>⛏️ GATHER +15 GOLD</button>
+            <button className="ranked-search-button" onClick={() => act("emp")} disabled={s.result !== "playing"}>✨ ARCANE BOLT · 120 DMG</button>
+            <button className="ranked-search-button" onClick={() => act("shield")} disabled={s.result !== "playing"}>🛡️ ROYAL WARD</button>
+            <button className="ranked-search-button" onClick={() => act("raid")} disabled={s.result !== "playing"}>🐎 KNIGHT ASSAULT · 220 DMG</button>
+            <button className="ranked-search-button ranked-ultimate-button" onClick={() => act("ultimate")} disabled={s.result !== "playing"}>🐉 DRAGONFIRE · 350 DMG</button>
           </div>
           {message && <div className="notice-card">{message}</div>}
           <div className="ranked-event-log"><strong>TRAINING LOG</strong>{s.log.map((line, index) => <div className="ranked-event-row" key={index}><span>{line}</span></div>)}</div>
           {report && <div className="solo-report"><strong>STRATEGY REPORT · {s.result.toUpperCase()}</strong><p>Actions: {s.actions} · Damage dealt: {s.damage} · Damage blocked: {s.blocked} · Gold mined: {s.mined}</p><p>{s.damage >= 500 ? "Strong offensive pressure. Keep balancing attacks with energy recovery." : "Try chaining mining with well-timed abilities to build stronger attacks."}</p><button className="ranked-search-button" onClick={() => start(s.mode)}>PLAY AGAIN</button></div>}
-          <button className="solo-back-button" onClick={() => { setMode("menu"); setSession(null); setMessage(""); }}>BACK TO TRAINING MENU</button>
+          <button className="solo-back-button" onClick={() => { setMode("menu"); setSession(null); setMessage(""); }}>RETURN TO ROYAL GROUNDS</button>
         </>
       )}
       <div className="notice-card">TRAINING ONLY · No RP, Ranked records or season points are changed.</div>
