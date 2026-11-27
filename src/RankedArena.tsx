@@ -51,6 +51,7 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
   const [readyState, setReadyState] = useState<ReadyResult | null>(null);
   const [battleState, setBattleState] = useState<BattleState | null>(null);
   const [battleEvents, setBattleEvents] = useState<BattleEvent[]>([]);
+  const [battleEffect, setBattleEffect] = useState<"attack" | "shield" | "magic" | "mine" | null>(null);
   const [readyLoading, setReadyLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -129,6 +130,11 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
     const result = (Array.isArray(data) ? data[0] : data) as BattleState | null;
     if (result) {
       setBattleState(result);
+      if (action !== "sync") {
+        const visual = action === "mine" ? "mine" : action === "golden_shield" ? "shield" : action === "ultimate" || action === "emp_strike" ? "magic" : "attack";
+        setBattleEffect(visual);
+        window.setTimeout(() => setBattleEffect(null), 850);
+      }
       if (result.match_status === "completed" || result.match_status === "cancelled") {
         setReadyState((previous) => previous ? { ...previous, match_status: result.match_status } : previous);
       }
@@ -182,7 +188,7 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
 
   return (
     <section className="ranked-arena">
-      <KingdomScene variant="battle" />
+      <KingdomScene variant="battle" effect={battleEffect} />
       <span className="section-kicker">RANKED • ROYAL WARFARE</span>
       <h2>War for the Crown</h2>
       <p>Challenge a real ruler in a five-minute server-controlled siege. Matchmaking balances rating and combat power.</p>
