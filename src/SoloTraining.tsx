@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 type Mode = "menu" | "practice" | "ai";
-type Side = { base: number; energy: number; ultimate: number; gold: number; shield: number; shieldUntil: number; empReady: number; raidReady: number };
+type Side = { base: number; energy: number; ultimate: number; gold: number; shield: number; shieldUntil: number; shieldReady: number; empReady: number; raidReady: number };
 type Session = { mode: Mode; player: Side; enemy: Side; seconds: number; actions: number; damage: number; blocked: number; mined: number; log: string[]; result: "playing" | "win" | "loss" | "draw" };
 
 const freshSide = (): Side => ({ base: 1000, energy: 100, ultimate: 0, gold: 0, shield: 0, shieldUntil: 0, shieldReady: 0, empReady: 0, raidReady: 0 });
