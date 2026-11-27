@@ -1,5 +1,3 @@
-import React from "react";
-
 type Props = { variant?: "kingdom" | "battle" | "training" | "ranking" | "social"; compact?: boolean };
 
 export default function KingdomScene({ variant = "kingdom", compact = false }: Props) {
