@@ -8,3 +8,18 @@
 
 
 .ranked-battle-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.ranked-battle-actions .ranked-search-button{margin:0;min-height:54px;padding:10px 8px;font-size:9px;line-height:1.35;letter-spacing:.35px}.ranked-battle-actions .ranked-ultimate-button{grid-column:1/-1;background:linear-gradient(145deg,#f6b6a0,#b94c35);border-color:#f6b6a0;color:#35120d}.ranked-event-log{margin-top:16px;padding-top:12px;border-top:1px solid #ffffff18}.ranked-event-log>strong{display:block;margin-bottom:8px;color:#e9c46f;font-size:9px;letter-spacing:1.2px}.ranked-event-row{display:flex;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px solid #ffffff0d;color:#d8cfbd;font-size:9px}.ranked-event-row small{color:#c9a45b;font-size:8px;white-space:nowrap}@media(max-width:360px){.ranked-battle-actions{grid-template-columns:1fr}.ranked-battle-actions .ranked-ultimate-button{grid-column:auto}}
+
+
+.solo-arena .ranked-arena-visual{background:radial-gradient(circle at 50% 55%,#285b5488,#172320 60%,#15171c);border-color:#64c9a044}
+.solo-mode-card{margin-top:12px;padding:15px;border:1px solid #ffffff18;border-radius:13px;background:linear-gradient(120deg,#1c2524,#17191d)}
+.solo-mode-card>strong{color:#e9c46f;font-size:12px;letter-spacing:.8px}
+.solo-mode-card p{margin:7px 0;color:#aaa493;font-size:10px;line-height:1.6}
+.solo-mode-card .ranked-search-button{margin-top:8px}
+.solo-difficulty{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;color:#b7aa91;font-size:9px;font-weight:800;letter-spacing:.7px}
+.solo-difficulty select{padding:8px 10px;border:1px solid #d9aa4a44;border-radius:8px;background:#202126;color:#f0d28a}
+.solo-bars{display:flex;justify-content:space-between;gap:8px;margin:10px 0;padding:10px;border:1px solid #ffffff12;border-radius:9px;background:#ffffff07;color:#d5bd84;font-size:8px;font-weight:800}
+.solo-report{margin-top:14px;padding:14px;border:1px solid #78cf8d55;border-radius:11px;background:#78cf8d10}
+.solo-report>strong{color:#a7e0b1;font-size:10px;letter-spacing:1px}
+.solo-report p{color:#d0c7b5;font-size:10px;line-height:1.6}
+.solo-back-button{width:100%;margin-top:10px;padding:12px;border:1px solid #ffffff20;border-radius:9px;background:#ffffff08;color:#c9bea9;font-size:9px;font-weight:900;letter-spacing:.7px}
+@media(max-width:380px){.bottom-nav .nav-item{min-width:52px;padding-left:5px;padding-right:5px}.bottom-nav .nav-item small{font-size:7px}}
