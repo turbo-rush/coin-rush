@@ -113,6 +113,7 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
   }
 
   const battleStarted = readyState?.match_status === "active" || battleState?.match_status === "active";
+  const battleVisible = battleStarted || battleState?.match_status === "completed";
 
   useEffect(() => {
     if (!battleStarted || !match?.match_id) return;
@@ -169,7 +170,7 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
         </div>
       )}
 
-      {battleStarted && battleState && (
+      {battleVisible && battleState && (
         <div className="ranked-match-result" aria-live="polite">
           <strong>{completed ? "MATCH COMPLETED" : "LIVE BATTLE"}</strong>
           <div className="ranked-spec-grid">
