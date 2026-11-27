@@ -171,7 +171,7 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
       golden_shield: "🛡️ Royal Ward raised",
       robot_raid: "🐎 Knight Assault",
       ultimate_overdrive: "🐉 Dragonfire",
-      match_completed: "🏆 Match completed",
+      match_completed: "👑 The crown has been claimed",
     };
     return labels[event] || event.replace(/_/g, " ");
   };
@@ -233,7 +233,7 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
             </div>
           ) : (
             <>
-              <p>{battleState.winner_id ? "Winner: " + (battleState.winner_id === match?.opponent_id ? "Opponent" : "You") : "Draw — equal result."}</p>
+              <p>{battleState.winner_id ? "Victor: " + (battleState.winner_id === match?.opponent_id ? "Opponent" : "You") : "Draw — equal result."}</p>
               <p>Ranked points: {battleState.own_rp_change > 0 ? "+" : ""}{battleState.own_rp_change} RP</p>
             </>
           )}
