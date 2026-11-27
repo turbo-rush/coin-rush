@@ -23,3 +23,41 @@
 .solo-report p{color:#d0c7b5;font-size:10px;line-height:1.6}
 .solo-back-button{width:100%;margin-top:10px;padding:12px;border:1px solid #ffffff20;border-radius:9px;background:#ffffff08;color:#c9bea9;font-size:9px;font-weight:900;letter-spacing:.7px}
 @media(max-width:380px){.bottom-nav .nav-item{min-width:52px;padding-left:5px;padding-right:5px}.bottom-nav .nav-item small{font-size:7px}}
+
+
+/* Solo Training: visible combatants and battlefield */
+.solo-combat-scene{position:relative;isolation:isolate;height:238px;margin:12px 0 16px;overflow:hidden;border:1px solid #ffffff1c;border-radius:15px;background:linear-gradient(180deg,#172528 0%,#1c2928 55%,#11191b 56%,#101519 100%);box-shadow:inset 0 -30px 50px #0005}
+.solo-combat-scene:before{content:"";position:absolute;z-index:-1;left:-10%;right:-10%;bottom:42px;height:62px;background:repeating-linear-gradient(90deg,#8bb7a00b 0 2px,transparent 2px 34px),linear-gradient(180deg,#45645a55,#263c37);transform:perspective(130px) rotateX(22deg);border-top:1px solid #a2c8a033}
+.solo-combat-scene:after{content:"";position:absolute;z-index:-1;inset:0;background:radial-gradient(ellipse at 50% 55%,transparent 5%,#06101455 100%);pointer-events:none}
+.solo-scene-base{position:absolute;top:12px;display:flex;flex-direction:column;gap:4px;width:37%;color:#c7d4c8;font-size:7px;font-weight:900;letter-spacing:.8px}
+.solo-scene-base strong{font-size:10px;color:#f4d27d}
+.solo-scene-base i{height:5px;border-radius:6px;background:#ffffff25;overflow:hidden}
+.solo-scene-base i b{display:block;height:100%;background:linear-gradient(90deg,#65c98b,#d5e87b)}
+.player-base{left:12px}.enemy-base{right:12px;text-align:right;align-items:flex-end}.enemy-base i{width:100%}
+.solo-fighter{position:absolute;bottom:38px;width:92px;height:145px;display:flex;align-items:flex-end;justify-content:center;filter:drop-shadow(0 8px 6px #0008)}
+.player-fighter{left:13%;animation:fighter-idle 2.8s ease-in-out infinite}
+.enemy-fighter{right:13%;transform:scaleX(-1);animation:fighter-idle-enemy 3.2s ease-in-out infinite}
+.fighter-shadow{position:absolute;bottom:0;width:84px;height:15px;border-radius:50%;background:#0008;filter:blur(5px)}
+.fighter-body{position:absolute;bottom:22px;width:54px;height:83px;border:2px solid #e9c56f;border-radius:15px 15px 10px 10px;background:linear-gradient(135deg,#e2b85e,#7e592d 58%,#332b25);box-shadow:inset 0 0 14px #ffe9a044,0 0 18px #e8b74a22}
+.fighter-core{position:absolute;left:17px;top:28px;width:17px;height:17px;border:2px solid #fff0b3;border-radius:50%;background:#7de5dc;box-shadow:0 0 13px #8fffff}
+.fighter-head{position:absolute;left:8px;top:-26px;width:35px;height:29px;border:2px solid #f5d88c;border-radius:11px 11px 7px 7px;background:linear-gradient(145deg,#f0d58c,#86602f)}
+.fighter-head b{position:absolute;left:7px;right:7px;top:10px;height:6px;border-radius:5px;background:#91f4ec;box-shadow:0 0 9px #91f4ec}
+.fighter-arm{position:absolute;top:16px;width:15px;height:48px;border:2px solid #d9b66b;border-radius:8px;background:linear-gradient(90deg,#8e6835,#e0b75d)}
+.arm-left{left:-15px;transform:rotate(13deg)}.arm-right{right:-15px;transform:rotate(-16deg)}
+.fighter-leg{position:absolute;bottom:4px;width:17px;height:34px;border:2px solid #b48b4b;border-radius:5px 5px 7px 7px;background:linear-gradient(90deg,#54402c,#b58c4b)}
+.leg-left{left:23px;transform:rotate(5deg)}.leg-right{right:23px;transform:rotate(-5deg)}
+.fighter-label{position:absolute;bottom:-17px;color:#f2d58e;font-size:7px;font-weight:900;letter-spacing:1px;white-space:nowrap}
+.ai-fighter .fighter-body{border-color:#e77b69;background:linear-gradient(135deg,#db7865,#78372f 58%,#2b2021)}
+.ai-fighter .fighter-head{border-color:#f3a18a;background:linear-gradient(145deg,#ef9a83,#853c35)}
+.ai-fighter .fighter-core,.ai-fighter .fighter-head b{background:#ff8876;box-shadow:0 0 13px #ff6555}
+.ai-fighter .fighter-arm,.ai-fighter .fighter-leg{border-color:#c56c5c;background:linear-gradient(90deg,#56302c,#c56c5c)}
+.target-fighter .fighter-body{height:69px;width:63px;bottom:23px;border-radius:9px;background:linear-gradient(135deg,#9da6a0,#485552);border-color:#bdc9bd}
+.target-fighter .fighter-head{width:48px;left:6px;background:linear-gradient(145deg,#c6d0c8,#65746c);border-color:#d0d9d0}
+.target-fighter .fighter-head b{background:#e5d18b;box-shadow:0 0 8px #f5d98c}
+.target-fighter .fighter-core{background:#e6cf86;box-shadow:0 0 10px #e6cf86}
+.target-fighter .fighter-arm,.target-fighter .fighter-leg{background:linear-gradient(90deg,#4a5752,#9aa69e);border-color:#aab8af}
+.solo-scene-vs{position:absolute;left:50%;top:55%;transform:translate(-50%,-50%);padding:6px 9px;border:1px solid #ffffff24;border-radius:8px;background:#09121499;color:#d6c69e;font-size:9px;font-weight:900;letter-spacing:1.4px}
+.scene-shield{position:absolute;bottom:12px;padding:5px 7px;border:1px solid #8de5e166;border-radius:7px;background:#153b3bbd;color:#aaf2e9;font-size:7px;font-weight:900}
+.player-shield{left:9px}.enemy-shield{right:9px}
+@keyframes fighter-idle{50%{translate:0 -5px}}@keyframes fighter-idle-enemy{50%{translate:0 -4px}}
+@media(max-width:380px){.solo-combat-scene{height:218px}.solo-fighter{transform:scale(.88);transform-origin:bottom center}.enemy-fighter{transform:scaleX(-1) scale(.88)}}
