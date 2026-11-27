@@ -71,19 +71,19 @@ export default function SoloTraining() {
       let label = "";
       if (action === "mine") {
         if (p.energy < 10) { setMessage("Not enough energy. Wait for regeneration."); return current; }
-        p.energy -= 10; p.gold += 15; p.ultimate = clamp(p.ultimate + 5, 0, 100); next.mined += 15; label = "You mined +15 gold";
+        p.energy -= 10; p.gold += 15; p.ultimate = clamp(p.ultimate + 5, 0, 100); next.mined += 15; label = "You gathered +15 gold";
       } else if (action === "emp") {
         if (p.energy < 35 || p.ultimate < 25 || now < p.empReady) { setMessage("EMP needs 35 energy, 25 Ultimate and its cooldown to be ready."); return current; }
-        p.energy -= 35; p.ultimate -= 25; p.empReady = now + 25; damage = 120; label = "You used EMP Strike";
+        p.energy -= 35; p.ultimate -= 25; p.empReady = now + 25; damage = 120; label = "You cast an Arcane Bolt";
       } else if (action === "shield") {
         if (p.energy < 25 || now < p.shieldReady) { setMessage("Golden Shield needs 25 energy and its cooldown to be ready."); return current; }
-        p.energy -= 25; p.shield = 200; p.shieldUntil = now + 12; p.shieldReady = now + 30; label = "You activated Golden Shield (200 shield / 12 sec)";
+        p.energy -= 25; p.shield = 200; p.shieldUntil = now + 12; p.shieldReady = now + 30; label = "You raised a Royal Ward (200 shield / 12 sec)";
       } else if (action === "raid") {
         if (p.energy < 40 || p.ultimate < 20 || now < p.raidReady) { setMessage("Robot Raid needs 40 energy, 20 Ultimate and its cooldown to be ready."); return current; }
-        p.energy -= 40; p.ultimate -= 20; p.raidReady = now + 30; damage = 220; label = "You launched Robot Raid";
+        p.energy -= 40; p.ultimate -= 20; p.raidReady = now + 30; damage = 220; label = "You ordered a Knight Assault";
       } else {
         if (p.ultimate < 100) { setMessage("Ultimate Overdrive requires 100 charge."); return current; }
-        p.ultimate = 0; damage = 350; label = "You unleashed Ultimate Overdrive";
+        p.ultimate = 0; damage = 350; label = "You unleashed Dragonfire";
       }
       if (damage > 0) {
         if (current.mode === "practice") {
