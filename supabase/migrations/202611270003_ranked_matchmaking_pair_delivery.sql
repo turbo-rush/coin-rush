@@ -43,13 +43,13 @@ begin
 
   -- If this player was already paired, return that exact match to either client.
   select
-    m.id,
-    case when m.player_one_id = v_uid then m.player_two_id else m.player_one_id end,
-    opponent.rating,
+    m.id as existing_match_id,
+    case when m.player_one_id = v_uid then m.player_two_id else m.player_one_id end as existing_opponent_id,
+    opponent.rating as existing_opponent_rating,
     case
       when m.player_one_id = v_uid then m.player_two_power
       else m.player_one_power
-    end
+    end as existing_opponent_combat_power
   into v_existing
   from public.ranked_matches m
   join public.profiles opponent
@@ -63,7 +63,8 @@ begin
   limit 1;
 
   if found then
-    return query select true, v_existing.id, v_existing.case, v_existing.rating, v_existing.case_1;
+    return query select true, v_existing.existing_match_id, v_existing.existing_opponent_id,
+      v_existing.existing_opponent_rating, v_existing.existing_opponent_combat_power;
     return;
   end if;
 
