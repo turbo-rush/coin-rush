@@ -109,8 +109,6 @@ begin
     v_own := jsonb_set(v_own, '{ultimate}', to_jsonb((v_own->>'ultimate')::numeric - 25), true);
     v_own := jsonb_set(v_own, '{emp_ready_at}', to_jsonb(v_now_epoch + 25), true);
     v_damage := 120;
-    v_opponent := jsonb_set(v_opponent, '{base_health}',
-      to_jsonb(greatest(0, coalesce((v_opponent->>'base_health')::integer, 1000) - v_damage)), true);
     v_damage_to_base := v_damage;
     v_event := 'emp_strike';
   elsif p_action = 'golden_shield' then
