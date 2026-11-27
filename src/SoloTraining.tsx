@@ -4,7 +4,7 @@ type Mode = "menu" | "practice" | "ai";
 type Side = { base: number; energy: number; ultimate: number; gold: number; shield: number; shieldUntil: number; empReady: number; raidReady: number };
 type Session = { mode: Mode; player: Side; enemy: Side; seconds: number; actions: number; damage: number; blocked: number; mined: number; log: string[]; result: "playing" | "win" | "loss" | "draw" };
 
-const freshSide = (): Side => ({ base: 1000, energy: 100, ultimate: 0, gold: 0, shield: 0, shieldUntil: 0, empReady: 0, raidReady: 0 });
+const freshSide = (): Side => ({ base: 1000, energy: 100, ultimate: 0, gold: 0, shield: 0, shieldUntil: 0, shieldReady: 0, empReady: 0, raidReady: 0 });
 const freshSession = (mode: Mode): Session => ({ mode, player: freshSide(), enemy: freshSide(), seconds: 300, actions: 0, damage: 0, blocked: 0, mined: 0, log: ["Training simulation started. No Ranked points are at stake."], result: "playing" });
 const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n));
 
@@ -26,8 +26,8 @@ export default function SoloTraining() {
         const now = 300 - next.seconds;
         let action = "";
         let damage = 0;
-        if (enemy.base < 650 && enemy.energy >= 25 && now >= enemy.empReady && difficulty !== "easy") {
-          enemy.energy -= 25; enemy.shield = 200; enemy.shieldUntil = now + 12; action = "AI activated Golden Shield";
+        if (enemy.base < 650 && enemy.energy >= 25 && now >= enemy.shieldReady && difficulty !== "easy") {
+          enemy.energy -= 25; enemy.shield = 200; enemy.shieldUntil = now + 12; enemy.shieldReady = now + 30; action = "AI activated Golden Shield";
         } else if (enemy.ultimate >= 100) {
           enemy.ultimate = 0; damage = 350; action = "AI used Ultimate Overdrive";
         } else if (enemy.energy >= 40 && enemy.ultimate >= 20 && now >= enemy.raidReady && difficulty !== "easy") {
@@ -75,8 +75,8 @@ export default function SoloTraining() {
         if (p.energy < 35 || p.ultimate < 25 || now < p.empReady) { setMessage("EMP needs 35 energy, 25 Ultimate and its cooldown to be ready."); return current; }
         p.energy -= 35; p.ultimate -= 25; p.empReady = now + 25; damage = 120; label = "You used EMP Strike";
       } else if (action === "shield") {
-        if (p.energy < 25) { setMessage("Golden Shield needs 25 energy."); return current; }
-        p.energy -= 25; p.shield = 200; p.shieldUntil = now + 12; label = "You activated Golden Shield (200 shield / 12 sec)";
+        if (p.energy < 25 || now < p.shieldReady) { setMessage("Golden Shield needs 25 energy and its cooldown to be ready."); return current; }
+        p.energy -= 25; p.shield = 200; p.shieldUntil = now + 12; p.shieldReady = now + 30; label = "You activated Golden Shield (200 shield / 12 sec)";
       } else if (action === "raid") {
         if (p.energy < 40 || p.ultimate < 20 || now < p.raidReady) { setMessage("Robot Raid needs 40 energy, 20 Ultimate and its cooldown to be ready."); return current; }
         p.energy -= 40; p.ultimate -= 20; p.raidReady = now + 30; damage = 220; label = "You launched Robot Raid";
@@ -98,7 +98,7 @@ export default function SoloTraining() {
       }
       next.actions += 1;
       next.log.unshift(`${label}${damage ? ` · ${damage} damage` : ""}`);
-      if (next.enemy.base <= 0) next.result = "win";
+      if (next.enemy.base <= 0 && current.mode === "practice") { next.enemy.base = 1000; next.log.unshift("Target destroyed — fresh target deployed."); } else if (next.enemy.base <= 0) next.result = "win";
       setMessage("");
       return { ...next, log: next.log.slice(0, 8) };
     });
