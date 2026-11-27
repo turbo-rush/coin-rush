@@ -8,7 +8,9 @@ alter table public.ranked_matches
 -- Run after 202611270004_ranked_match_readiness.sql.
 -- Clients can request actions, but all costs, regeneration, damage and results are server-calculated.
 
-create or replace function public.perform_ranked_action(
+drop function if exists public.perform_ranked_action(uuid, text);
+
+create function public.perform_ranked_action(
   p_match_id uuid,
   p_action text
 )
@@ -19,6 +21,8 @@ returns table (
   opponent_state jsonb,
   state_version integer,
   winner_id uuid,
+  own_rp_change integer,
+  opponent_rp_change integer,
   last_event text
 )
 language plpgsql
@@ -68,7 +72,10 @@ begin
 
   if v_match.status <> 'active' then
     return query select v_match.status, 0, v_own, v_opponent,
-      v_match.state_version, v_match.winner_id, 'match_not_active'::text;
+      v_match.state_version, v_match.winner_id,
+      case when v_is_one then v_match.player_one_rp_change else v_match.player_two_rp_change end,
+      case when v_is_one then v_match.player_two_rp_change else v_match.player_one_rp_change end,
+      'match_not_active'::text;
     return;
   end if;
 
@@ -247,7 +254,10 @@ begin
   v_opponent := case when v_is_one then v_match.player_two_state else v_match.player_one_state end;
 
   return query select v_match.status, v_remaining, v_own, v_opponent,
-    v_match.state_version, v_match.winner_id, v_event;
+    v_match.state_version, v_match.winner_id,
+    case when v_is_one then v_match.player_one_rp_change else v_match.player_two_rp_change end,
+    case when v_is_one then v_match.player_two_rp_change else v_match.player_one_rp_change end,
+    v_event;
 end;
 $$;
 
