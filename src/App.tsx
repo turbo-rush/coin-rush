@@ -99,14 +99,15 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (tab !== "ranking" || authStatus !== "online") return;
     const client = supabase;
-    if (tab !== "ranking" || authStatus !== "online" || !client) return;
+    if (!client) return;
     let cancelled = false;
 
-    async function loadLeaderboard() {
+    const loadLeaderboard = async (db: NonNullable<typeof supabase>) => {
       setLeaderboardLoading(true);
       setLeaderboardError("");
-      const { data, error } = await client
+      const { data, error } = await db
         .from("profiles")
         .select("id, username, rating, wins, losses")
         .order("rating", { ascending: false })
@@ -121,9 +122,9 @@ export default function App() {
         setLeaderboard((data ?? []) as LeaderboardProfile[]);
       }
       setLeaderboardLoading(false);
-    }
+    };
 
-    void loadLeaderboard();
+    void loadLeaderboard(client);
     return () => { cancelled = true; };
   }, [tab, authStatus]);
 
