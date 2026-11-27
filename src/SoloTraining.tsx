@@ -5,7 +5,7 @@ type Side = { base: number; energy: number; ultimate: number; gold: number; shie
 type Session = { mode: Mode; player: Side; enemy: Side; seconds: number; actions: number; damage: number; blocked: number; mined: number; log: string[]; result: "playing" | "win" | "loss" | "draw" };
 
 const freshSide = (): Side => ({ base: 1000, energy: 100, ultimate: 0, gold: 0, shield: 0, shieldUntil: 0, shieldReady: 0, empReady: 0, raidReady: 0 });
-const freshSession = (mode: Mode): Session => ({ mode, player: freshSide(), enemy: freshSide(), seconds: 300, actions: 0, damage: 0, blocked: 0, mined: 0, log: ["Training simulation started. No Ranked points are at stake."], result: "playing" });
+const freshSession = (mode: Mode): Session => ({ mode, player: { ...freshSide(), ultimate: mode === "practice" ? 100 : 0 }, enemy: freshSide(), seconds: 300, actions: 0, damage: 0, blocked: 0, mined: 0, log: ["Training simulation started. No Ranked points are at stake."], result: "playing" });
 const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n));
 
 export default function SoloTraining() {
