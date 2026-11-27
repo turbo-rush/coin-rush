@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "./lib/supabase";
 import RankedArena from "./RankedArena";
+import SoloTraining from "./SoloTraining";
 
-type Tab = "empire" | "battle" | "ranking" | "social";
+type Tab = "empire" | "battle" | "solo" | "ranking" | "social";
 type LeaderboardProfile = { id: string; username: string; rating: number; wins: number; losses: number };
 type Save = {
   coins: number; energy: number; mineLevel: number; tapPower: number;
@@ -193,6 +194,7 @@ export default function App() {
   const tabs: { id: Tab; icon: string; label: string }[] = [
     { id: "empire", icon: "🏭", label: "Empire" },
     { id: "battle", icon: "⚔️", label: "Battle" },
+    { id: "solo", icon: "🎯", label: "Solo" },
     { id: "ranking", icon: "🏆", label: "Ranking" },
     { id: "social", icon: "👥", label: "Social" },
   ];
@@ -224,6 +226,8 @@ export default function App() {
       </>}
 
       {tab === "battle" && <RankedArena authStatus={authStatus} />}
+
+      {tab === "solo" && <SoloTraining />}
 
       {tab === "ranking" && <section className="feature-page"><div className="feature-art trophy-art">🏆</div><span className="section-kicker">SEASON ZERO</span><h2>Global ranking</h2><p>Live player profiles from the COIN RUSH server, sorted by rating.</p>{leaderboardLoading && <div className="notice-card">Loading global leaderboard...</div>}{leaderboardError && <div className="notice-card">{leaderboardError}</div>}{!leaderboardLoading && !leaderboardError && leaderboard.length > 0 && <><div className="rank-preview"><span>YOUR CURRENT RANK</span><strong>{(() => { const index = leaderboard.findIndex((player) => player.id === currentUserId); return index >= 0 ? `#${index + 1}` : "NOT IN TOP 20"; })()}</strong><small>{leaderboard.find((player) => player.id === currentUserId)?.username ?? "Your profile is outside the top 20"} · Rating {leaderboard.find((player) => player.id === currentUserId)?.rating ?? "—"}</small></div><div className="leaderboard-list">{leaderboard.map((player, index) => <div className={player.id === currentUserId ? "rank-row current-player" : "rank-row"} key={player.id}><span>{String(index + 1).padStart(2, "0")}</span><b>{player.username}{player.id === currentUserId ? " (YOU)" : ""}<small>{player.wins} W · {player.losses} L</small></b><strong>{player.rating.toLocaleString("en-US")} RP</strong></div>)}</div></>}{!leaderboardLoading && !leaderboardError && leaderboard.length === 0 && <div className="notice-card">No player profiles found yet. Your profile will appear here once it is available.</div>}{authStatus !== "online" && <div className="notice-card">Connect to your online profile to view the live leaderboard.</div>}</section>}
 
