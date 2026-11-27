@@ -127,6 +127,19 @@ export default function SoloTraining() {
             <div><span>{s.mode === "ai" ? "AI BASE" : "TARGET HP"}</span><strong>{s.enemy.base}</strong></div>
           </div>
           {s.mode === "ai" && <div className="solo-bars"><span>TIME {time}</span><span>AI ENERGY {Math.floor(s.enemy.energy)} · ULT {Math.floor(s.enemy.ultimate)}</span></div>}
+          <div className={`solo-combat-scene ${s.mode === "ai" ? "ai-scene" : "practice-scene"}`}>
+            <div className="solo-scene-base player-base"><span>YOUR BASE</span><strong>{s.player.base} HP</strong><i><b style={{ width: `${s.player.base / 10}%` }} /></i></div>
+            <div className="solo-fighter player-fighter" aria-label="Your battle robot">
+              <span className="fighter-shadow" /><span className="fighter-leg leg-left" /><span className="fighter-leg leg-right" /><span className="fighter-body"><i className="fighter-core" /><i className="fighter-arm arm-left" /><i className="fighter-arm arm-right" /><i className="fighter-head"><b /></i></span><span className="fighter-label">YOU</span>
+            </div>
+            <div className="solo-scene-vs">{s.mode === "ai" ? "VS" : "TARGET"}</div>
+            <div className={`solo-fighter enemy-fighter ${s.mode === "ai" ? "ai-fighter" : "target-fighter"}`} aria-label={s.mode === "ai" ? "AI battle robot" : "Training target"}>
+              <span className="fighter-shadow" /><span className="fighter-leg leg-left" /><span className="fighter-leg leg-right" /><span className="fighter-body"><i className="fighter-core" /><i className="fighter-arm arm-left" /><i className="fighter-arm arm-right" /><i className="fighter-head"><b /></i></span><span className="fighter-label">{s.mode === "ai" ? "TACTICAL AI" : "DUMMY"}</span>
+            </div>
+            <div className="solo-scene-base enemy-base"><span>{s.mode === "ai" ? "AI BASE" : "TARGET"}</span><strong>{s.enemy.base} HP</strong><i><b style={{ width: `${s.enemy.base / 10}%` }} /></i></div>
+            {s.player.shield > 0 && <span className="scene-shield player-shield">🛡️ SHIELD {s.player.shield}</span>}
+            {s.enemy.shield > 0 && <span className="scene-shield enemy-shield">🛡️ SHIELD {s.enemy.shield}</span>}
+          </div>
           <p>YOUR ENERGY {Math.floor(s.player.energy)}/100 · ULTIMATE {Math.floor(s.player.ultimate)}/100 · GOLD {s.player.gold} · SHIELD {s.player.shield}</p>
           <div className="ranked-battle-actions">
             <button className="ranked-search-button" onClick={() => act("mine")} disabled={s.result !== "playing"}>⛏️ MINE +15 GOLD</button>
