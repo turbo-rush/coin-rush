@@ -1,9 +1,9 @@
-type Props = { variant?: "kingdom" | "battle" | "training" | "ranking" | "social"; compact?: boolean };
+type Props = { variant?: "kingdom" | "battle" | "training" | "ranking" | "social"; compact?: boolean; effect?: "attack" | "shield" | "magic" | "mine" | null };
 
-export default function KingdomScene({ variant = "kingdom", compact = false }: Props) {
+export default function KingdomScene({ variant = "kingdom", compact = false, effect = null }: Props) {
   const enemy = variant === "battle" || variant === "training";
   return (
-    <div className={`kingdom-scene kingdom-scene-${variant} ${compact ? "kingdom-scene-compact" : ""}`} role="img" aria-label="Isometric medieval kingdom with castles, towers, troops and resource buildings">
+    <div className={`kingdom-scene kingdom-scene-${variant} ${compact ? "kingdom-scene-compact" : ""} ${effect ? `kingdom-effect-${effect}` : ""}`} role="img" aria-label="Isometric medieval kingdom with castles, towers, troops and resource buildings">
       <svg viewBox="0 0 800 460" preserveAspectRatio="xMidYMid slice">
         <defs>
           <linearGradient id="land" x2="0" y2="1"><stop stopColor="#98744a"/><stop offset="1" stopColor="#4c4935"/></linearGradient>
@@ -52,7 +52,7 @@ export default function KingdomScene({ variant = "kingdom", compact = false }: P
         <g className="scene-impact" transform="translate(400 300)"><circle r="24" fill="#e3b85b" opacity=".12"/><path d="M-12 0L0-15 12 0 0 15Z" fill="#f4d178" opacity=".8"/><path d="M0-15V15M-12 0H12" stroke="#fff0b7" strokeWidth="2"/></g>
         <g fill="#e7c36d" fontFamily="sans-serif" fontSize="12" fontWeight="bold"><text x="32" y="34">THE CROWN LANDS</text><text x="32" y="52" fontSize="8" letterSpacing="2" fill="#e1d2ae">KINGDOM TERRITORY</text></g>
       </svg>
-      <div className="kingdom-scene-vignette"/>
+      <div className="kingdom-scene-vignette"/>{effect && <div className="kingdom-action-flash" aria-hidden="true"/>}
       <div className="kingdom-scene-caption"><span>{variant === "training" ? "ROYAL TRAINING GROUNDS" : variant === "battle" ? "THE CROWN FRONTIER" : variant === "ranking" ? "REALMS OF THE CROWN" : variant === "social" ? "ALLIANCE TERRITORIES" : "YOUR KINGDOM"}</span><b>{variant === "battle" ? "⚔ LIVE WARFRONT" : variant === "training" ? "✦ PRACTICE FIELD" : "♛ KINGDOM AGE"}</b></div>
     </div>
   );
