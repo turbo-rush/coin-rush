@@ -162,15 +162,18 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
   const formatTime = (seconds: number) =>
     `${Math.floor(seconds / 60).toString().padStart(2, "0")}:${(seconds % 60).toString().padStart(2, "0")}`;
 
-  const eventLabel = (event: string) => ({
-    match_started: "⚔️ Battle started",
-    mine: "⛏️ Mining operation",
-    emp_strike: "⚡ EMP Strike",
-    golden_shield: "🛡️ Golden Shield activated",
-    robot_raid: "🤖 Robot Raid",
-    ultimate_overdrive: "🔥 Ultimate Overdrive",
-    match_completed: "🏆 Match completed",
-  }[event] || event.replaceAll("_", " "));
+  const eventLabel = (event: string) => {
+    const labels: Record<string, string> = {
+      match_started: "⚔️ Battle started",
+      mine: "⛏️ Mining operation",
+      emp_strike: "⚡ EMP Strike",
+      golden_shield: "🛡️ Golden Shield activated",
+      robot_raid: "🤖 Robot Raid",
+      ultimate_overdrive: "🔥 Ultimate Overdrive",
+      match_completed: "🏆 Match completed",
+    };
+    return labels[event] || event.replace(/_/g, " ");
+  };
 
   const own = battleState?.own_state;
   const opponent = battleState?.opponent_state;
