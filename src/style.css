@@ -173,3 +173,12 @@ body{background:radial-gradient(ellipse at 50% 0%,#4b3824 0%,#211b15 42%,#0d0e0d
 @keyframes kingdom-wind{0%,100%{rotate:-4deg}50%{rotate:5deg}}
 @keyframes kingdom-river{to{stroke-dashoffset:-120}}
 @media(prefers-reduced-motion:reduce){.kingdom-scene .scene-soldier,.kingdom-scene .scene-projectiles,.kingdom-scene .scene-impact,.kingdom-scene .scene-flags,.kingdom-scene .scene-river{animation:none!important}}
+
+
+/* Action-triggered battlefield feedback */
+.kingdom-action-flash{position:absolute;z-index:2;inset:0;pointer-events:none;mix-blend-mode:screen;animation:kingdom-action-burst .82s ease-out both}
+.kingdom-effect-attack .kingdom-action-flash{background:radial-gradient(ellipse at 63% 58%,#ffb65a88 0%,#e66c3433 18%,transparent 58%)}
+.kingdom-effect-shield .kingdom-action-flash{background:radial-gradient(ellipse at 28% 58%,#75d9ff99 0%,#397ac955 24%,transparent 62%)}
+.kingdom-effect-magic .kingdom-action-flash{background:radial-gradient(ellipse at 68% 43%,#d6a4ffbb 0%,#8555d855 24%,transparent 65%)}
+.kingdom-effect-mine .kingdom-action-flash{background:radial-gradient(ellipse at 36% 75%,#ffe28c99 0%,#d79a3d44 22%,transparent 58%)}
+@keyframes kingdom-action-burst{0%{opacity:0;scale:.72}24%{opacity:1;scale:1.08}100%{opacity:0;scale:1.18}}
