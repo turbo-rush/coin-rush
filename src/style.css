@@ -61,3 +61,70 @@
 .player-shield{left:9px}.enemy-shield{right:9px}
 @keyframes fighter-idle{50%{translate:0 -5px}}@keyframes fighter-idle-enemy{50%{translate:0 -4px}}
 @media(max-width:380px){.solo-combat-scene{height:218px}.solo-fighter{transform:scale(.88);transform-origin:bottom center}.enemy-fighter{transform:scaleX(-1) scale(.88)}}
+
+
+/* COIN RUSH: medieval kingdom visual system */
+:root{color:#f2e6c9;background:#100f0c}
+body{background:radial-gradient(ellipse at 50% 0%,#4b3824 0%,#211b15 42%,#0d0e0d 100%)}
+.app-shell{background:linear-gradient(180deg,#2a2118 0%,#171612 38%,#0e100f 100%);border-left:1px solid #d8b36b18;border-right:1px solid #d8b36b18}
+.brand-mark{border-radius:50%;background:radial-gradient(circle at 35% 25%,#fff0bd,#c08b3e 65%,#67431f);border:2px solid #f0d28b;color:#493019;font-size:26px;box-shadow:0 0 0 3px #5d4528,0 5px 22px #e6a33230}
+.eyebrow,.section-kicker,.wallet-label{color:#c3a56c}
+.player-strip{border-color:#a88b573d;background:linear-gradient(100deg,#332a1e,#201e19);color:#c4b38f}
+.player-strip strong{color:#f0d79f}
+.level-pill,.tiny-tag,.coming-tag{border-color:#c49a4e66;color:#e9c77e;background:#9b6c2515}
+.wallet-card{border-color:#a88b573d;background:linear-gradient(145deg,#3b3022,#211f1a);box-shadow:inset 0 1px #fff1}
+.wallet-card>strong{color:#f5d487}
+.energy-track{background:#493d2b}.energy-fill{background:linear-gradient(90deg,#8d612b,#f6d37d)}
+.kingdom-hero{position:relative;isolation:isolate;min-height:280px;margin-top:15px;padding:0 0 56px;border:1px solid #d7b36c66;border-radius:15px;overflow:hidden;background:#30281d;box-shadow:0 12px 30px #0006,inset 0 1px #fff2}
+.kingdom-hero>.kingdom-scene{position:absolute;inset:0;height:100%;border:0;border-radius:0}
+.kingdom-hero:after{content:"";position:absolute;z-index:0;inset:0;background:linear-gradient(90deg,#17140fdb 0%,#17140f8c 48%,transparent 100%),linear-gradient(0deg,#17140f 0%,transparent 45%);pointer-events:none}
+.kingdom-hero-copy{position:relative;z-index:1;padding:22px 18px;max-width:285px}
+.kingdom-hero-copy h2{margin:7px 0;color:#f5dfaa;font-family:'Barlow Condensed',sans-serif;font-size:32px;line-height:1.02;text-shadow:0 2px 8px #000}
+.kingdom-hero-copy h2 em{display:block;margin-top:5px;color:#e6bd68;font-family:Inter,sans-serif;font-size:10px;font-style:normal;letter-spacing:1px}
+.kingdom-hero-copy p{color:#e0d2b4;font-size:10px;line-height:1.55;text-shadow:0 1px 5px #000}
+.kingdom-hero .production-line{z-index:2;border-color:#e5c98944;color:#ddc99e}
+.kingdom-hero .production-line strong{color:#ffe19a}
+.rush-panel{border-color:#c49a4e66;background:linear-gradient(110deg,#4a3520,#252019 72%)}
+.rush-panel h2{color:#f4d28a}
+.rush-button,.buy-button,.ranked-search-button,.mine-button{border-color:#f2d28a;background:linear-gradient(145deg,#f7dfa0 0%,#d3a24d 55%,#986126 100%);color:#38240f;box-shadow:inset 0 1px #fff8,0 4px 14px #0003}
+.upgrade-card{border-color:#9e82503b;background:linear-gradient(100deg,#30271d,#1d1c18)}
+.upgrade-icon{border-color:#c59b4b55;background:#bd8a351b}
+.upgrade-info h3{color:#f0dfbd}
+.mine-action{border-color:#a88b573d;background:linear-gradient(100deg,#33291d,#201e19)}
+.feature-page h2,.ranked-arena h2{color:#f2dfb5}
+.feature-page>p,.ranked-arena>p{color:#c1b49a}
+.ranked-spec-grid div{border-color:#a88b573d;background:#2b261e}
+.ranked-spec-grid span{color:#b9a27a}.ranked-spec-grid strong{color:#f2d48a}
+.ranked-arena-visual{border-color:#c59b4b66}
+.ranked-search-status,.ranked-match-result{border-color:#c59b4b66;background:#9b6c2515}
+.ranked-search-status strong,.ranked-match-result>strong{color:#f0d38d}
+.solo-mode-card{border-color:#a88b573d;background:linear-gradient(120deg,#33291d,#211f1a)}
+.solo-mode-card>strong{color:#f1d18a}
+.solo-difficulty{color:#d4c29e}.solo-difficulty select{border-color:#b9945666;background:#28231b;color:#f5dfaa}
+.solo-report{border-color:#b69b5c66;background:#8c6b2b18}
+.solo-report>strong{color:#e9d18f}
+.solo-back-button{border-color:#a88b5744;background:#ffffff0a;color:#dfd0b1}
+.notice-card{border-color:#c49a4e44;background:#8b64221c;color:#d3c09a}
+.ranked-event-log{border-color:#c49a4e44}.ranked-event-log>strong{color:#e8c978}.ranked-event-row{border-color:#ffffff12;color:#dfd2b9}
+.bottom-nav{border-top:1px solid #b38b4b55;background:#171612ed}
+.nav-item.active{background:#b88b371b;color:#f4d17b}
+.kingdom-scene{position:relative;isolation:isolate;width:100%;aspect-ratio:16/9;min-height:175px;overflow:hidden;border:1px solid #bca06a66;border-radius:14px;background:#26241d;box-shadow:0 9px 25px #0005}
+.kingdom-scene svg{display:block;width:100%;height:100%}
+.kingdom-scene-vignette{position:absolute;inset:0;background:linear-gradient(180deg,#080b0b33,transparent 42%,#080b0bc9);pointer-events:none}
+.kingdom-scene-caption{position:absolute;left:12px;right:12px;bottom:10px;display:flex;justify-content:space-between;align-items:end;gap:8px;color:#f2dfb5;text-shadow:0 2px 5px #000;font-size:8px;font-weight:900;letter-spacing:1.1px}
+.kingdom-scene-caption b{padding:5px 7px;border:1px solid #e0bd7855;border-radius:6px;background:#191812aa;color:#f2d28a;font-size:7px;white-space:nowrap}
+.kingdom-scene-battle svg .scene-projectiles{animation:arrow-flight 1.7s linear infinite}
+.kingdom-scene-training svg .scene-troops{opacity:.7}
+.kingdom-scene-ranking svg .scene-projectiles,.kingdom-scene-social svg .scene-projectiles{display:none}
+.kingdom-scene-compact{margin-bottom:18px;min-height:150px;aspect-ratio:16/8}
+.kingdom-scene-compact .kingdom-scene-caption{bottom:8px}
+.kingdom-scene-compact .kingdom-scene-caption span{font-size:7px}
+@keyframes arrow-flight{50%{opacity:.25;transform:translate(9px,-5px)}}
+.solo-kingdom-battle{margin:14px 0;padding:8px;border:1px solid #b8945366;border-radius:13px;background:linear-gradient(145deg,#3a2d1e,#1c1b17);box-shadow:inset 0 1px #fff2,0 8px 22px #0004}
+.solo-kingdom-battle .kingdom-scene{border-radius:8px;border-color:#c3a16a55}
+.solo-kingdom-status{display:flex;justify-content:space-between;gap:8px;padding:4px 3px 8px;color:#cdb98f;font-size:7px;font-weight:900;letter-spacing:.6px}
+.solo-kingdom-status span{display:flex;flex-direction:column;gap:3px}
+.solo-kingdom-status span:last-child{text-align:right;align-items:flex-end}
+.solo-kingdom-status b{color:#f1d18a;font-size:10px}
+.solo-shield-status{padding:8px 3px 3px;color:#a9c7b2}
+@media(max-width:380px){.kingdom-hero{min-height:255px}.kingdom-hero-copy{padding:17px 14px;max-width:245px}.kingdom-hero-copy h2{font-size:28px}.kingdom-scene-compact{min-height:130px}}
