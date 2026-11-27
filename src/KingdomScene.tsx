@@ -21,7 +21,7 @@ export default function KingdomScene({ variant = "kingdom", compact = false }: P
         <path d="M0 0L800 0 800 460 0 460Z" fill="url(#tiles)"/>
         <path d="M-30 330L180 220 340 245 525 145 830 190" fill="none" stroke="#d5bd8c" strokeWidth="55" opacity=".38"/>
         <path d="M-30 330L180 220 340 245 525 145 830 190" fill="none" stroke="#756448" strokeWidth="39" opacity=".85"/>
-        <path d="M600 0Q550 100 630 170T760 320" fill="none" stroke="#567b79" strokeWidth="44" opacity=".65"/>
+        <path className="scene-river" d="M600 0Q550 100 630 170T760 320" fill="none" stroke="#567b79" strokeWidth="44" opacity=".65"/>
         <path d="M600 0Q550 100 630 170T760 320" fill="none" stroke="#9bc4b2" strokeWidth="3" opacity=".25"/>
         <g opacity=".75" fill="#263b30"><path d="M35 70l28-42 28 42zM75 105l34-52 34 52zM720 70l30-48 30 48zM670 130l26-42 26 42zM80 410l30-48 30 48z"/></g>
         <g transform="translate(345 130)">
@@ -34,7 +34,7 @@ export default function KingdomScene({ variant = "kingdom", compact = false }: P
           <path d="M-20 113Q0 92 20 113V143H-20Z" fill="#282b29"/>
           <g fill="#8e8065" stroke="#514b40" strokeWidth="4"><path d="M-110 57V-5L-80-24-50-5V82Z"/><path d="M50 82V-5L80-24 110-5V57Z"/><path d="M-24 37V-35L0-58 24-35V37Z"/></g>
           <g fill="#d1bd91"><path d="M-110-5L-80-40-50-5Z"/><path d="M50-5L80-40 110-5Z"/><path d="M-24-35L0-75 24-35Z"/></g>
-          <g fill="#a84435"><path d="M-80-40V-80L-77-80-77-42Z"/><path d="M80-40V-82L83-82 83-40Z"/><path d="M0-75V-120L4-120 4-75Z"/></g>
+          <g className="scene-flags" fill="#a84435"><path d="M-80-40V-80L-77-80-77-42Z"/><path d="M80-40V-82L83-82 83-40Z"/><path d="M0-75V-120L4-120 4-75Z"/></g>
           <path d="M0-120L38-109 0-96Z" fill={enemy ? "#b95b49" : "#3976a5"}/>
         </g>
         <g transform="translate(100 205)"><path d="M0 35L55 5 110 35 55 65Z" fill="#3f453b"/><path d="M0 35V80L55 110V65Z" fill="#695944"/><path d="M55 65L110 35V80L55 110Z" fill="#4d493a"/><path d="M0 35L55 5 110 35 55 65Z" fill="#c1a77a"/><path d="M14 30L55 8 96 30 55 52Z" fill="#7b4838"/><path d="M43 47V10L55 0 67 10V54Z" fill="#88765a"/><path d="M35 9L55-15 75 9Z" fill="#b8a27a"/><path d="M55-15V-43L58-43 58-15Z" fill="#c6a34c"/><path d="M58-42L85-34 58-25Z" fill="#4779a2"/></g>
@@ -43,13 +43,13 @@ export default function KingdomScene({ variant = "kingdom", compact = false }: P
         <g fill="#294b39" stroke="#667a4c" strokeWidth="3"><path d="M42 155l22-42 22 42z"/><path d="M58 177l25-46 25 46z"/><path d="M720 390l26-48 26 48z"/><path d="M690 410l22-42 22 42z"/><path d="M240 60l19-35 19 35z"/><path d="M205 80l25-44 25 44z"/></g>
         <g transform="translate(255 345)"><path d="M0 15L38-5 76 15 38 35Z" fill="#49483b"/><path d="M0 15V44L38 64V35Z" fill="#65543d"/><path d="M38 35L76 15V44L38 64Z" fill="#403d34"/><path d="M0 15L38-5 76 15 38 35Z" fill="url(#gold)"/><path d="M18 17L38 6 58 17 38 28Z" fill="#f4d477"/><path d="M38 6V-25" stroke="#d9c48e" strokeWidth="4"/><path d="M38-25L57-17 38-9Z" fill="#d8b34e"/></g>
         <g className="scene-troops" stroke="#202a2b" strokeWidth="3">
-          <g transform="translate(210 260)"><ellipse cx="0" cy="24" rx="17" ry="6" fill="#171b19" stroke="none"/><path d="M-9 0L0-10 9 0 7 17H-7Z" fill="#4779a4"/><circle cy="-15" r="7" fill="#c8b48b"/><path d="M-8-19L0-27 8-19" fill="#8b9eaa"/><path d="M8 2L20-12" stroke="#d7c69b" strokeWidth="4"/></g>
-          <g transform="translate(245 286)"><ellipse cx="0" cy="24" rx="17" ry="6" fill="#171b19" stroke="none"/><path d="M-9 0L0-10 9 0 7 17H-7Z" fill="#4779a4"/><circle cy="-15" r="7" fill="#c8b48b"/><path d="M-8-19L0-27 8-19" fill="#8b9eaa"/><path d="M8 2L20-12" stroke="#d7c69b" strokeWidth="4"/></g>
-          <g transform="translate(560 185)"><ellipse cx="0" cy="24" rx="17" ry="6" fill="#171b19" stroke="none"/><path d="M-9 0L0-10 9 0 7 17H-7Z" fill="#a74e3c"/><circle cy="-15" r="7" fill="#c8b48b"/><path d="M-8-19L0-27 8-19" fill="#bd8b62"/><path d="M8 2L20-12" stroke="#d7c69b" strokeWidth="4"/></g>
-          <g transform="translate(590 210)"><ellipse cx="0" cy="24" rx="17" ry="6" fill="#171b19" stroke="none"/><path d="M-9 0L0-10 9 0 7 17H-7Z" fill="#a74e3c"/><circle cy="-15" r="7" fill="#c8b48b"/><path d="M-8-19L0-27 8-19" fill="#bd8b62"/><path d="M8 2L20-12" stroke="#d7c69b" strokeWidth="4"/></g>
+          <g className="scene-soldier scene-soldier-one" transform="translate(210 260)"><ellipse cx="0" cy="24" rx="17" ry="6" fill="#171b19" stroke="none"/><path d="M-9 0L0-10 9 0 7 17H-7Z" fill="#4779a4"/><circle cy="-15" r="7" fill="#c8b48b"/><path d="M-8-19L0-27 8-19" fill="#8b9eaa"/><path d="M8 2L20-12" stroke="#d7c69b" strokeWidth="4"/></g>
+          <g className="scene-soldier scene-soldier-two" transform="translate(245 286)"><ellipse cx="0" cy="24" rx="17" ry="6" fill="#171b19" stroke="none"/><path d="M-9 0L0-10 9 0 7 17H-7Z" fill="#4779a4"/><circle cy="-15" r="7" fill="#c8b48b"/><path d="M-8-19L0-27 8-19" fill="#8b9eaa"/><path d="M8 2L20-12" stroke="#d7c69b" strokeWidth="4"/></g>
+          <g className="scene-soldier scene-soldier-three" transform="translate(560 185)"><ellipse cx="0" cy="24" rx="17" ry="6" fill="#171b19" stroke="none"/><path d="M-9 0L0-10 9 0 7 17H-7Z" fill="#a74e3c"/><circle cy="-15" r="7" fill="#c8b48b"/><path d="M-8-19L0-27 8-19" fill="#bd8b62"/><path d="M8 2L20-12" stroke="#d7c69b" strokeWidth="4"/></g>
+          <g className="scene-soldier scene-soldier-four" transform="translate(590 210)"><ellipse cx="0" cy="24" rx="17" ry="6" fill="#171b19" stroke="none"/><path d="M-9 0L0-10 9 0 7 17H-7Z" fill="#a74e3c"/><circle cy="-15" r="7" fill="#c8b48b"/><path d="M-8-19L0-27 8-19" fill="#bd8b62"/><path d="M8 2L20-12" stroke="#d7c69b" strokeWidth="4"/></g>
         </g>
         <g className="scene-projectiles"><path d="M270 250Q380 150 510 185" fill="none" stroke="#ffd477" strokeWidth="3" strokeDasharray="7 9"/><path d="M270 250Q380 150 510 185" fill="none" stroke="#fff1ba" strokeWidth="1"/></g>
-        <g transform="translate(400 300)"><circle r="24" fill="#e3b85b" opacity=".12"/><path d="M-12 0L0-15 12 0 0 15Z" fill="#f4d178" opacity=".8"/><path d="M0-15V15M-12 0H12" stroke="#fff0b7" strokeWidth="2"/></g>
+        <g className="scene-impact" transform="translate(400 300)"><circle r="24" fill="#e3b85b" opacity=".12"/><path d="M-12 0L0-15 12 0 0 15Z" fill="#f4d178" opacity=".8"/><path d="M0-15V15M-12 0H12" stroke="#fff0b7" strokeWidth="2"/></g>
         <g fill="#e7c36d" fontFamily="sans-serif" fontSize="12" fontWeight="bold"><text x="32" y="34">THE CROWN LANDS</text><text x="32" y="52" fontSize="8" letterSpacing="2" fill="#e1d2ae">KINGDOM TERRITORY</text></g>
       </svg>
       <div className="kingdom-scene-vignette"/>
