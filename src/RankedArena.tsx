@@ -21,14 +21,25 @@ type ReadyResult = {
   state_version: number;
 };
 
+type BattleAction = "sync" | "mine" | "emp_strike" | "golden_shield" | "robot_raid" | "ultimate";
+
 type BattleState = {
   match_status: "active" | "completed" | "cancelled" | "matched";
   remaining_seconds: number;
-  own_state: { health?: number; energy?: number; ultimate?: number; base_health?: number; gold?: number };
-  opponent_state: { health?: number; energy?: number; ultimate?: number; base_health?: number; gold?: number };
+  own_state: { health?: number; energy?: number; ultimate?: number; base_health?: number; gold?: number; shield?: number; shield_until?: number };
+  opponent_state: { health?: number; energy?: number; ultimate?: number; base_health?: number; gold?: number; shield?: number };
   state_version: number;
   winner_id: string | null;
+  own_rp_change: number;
+  opponent_rp_change: number;
   last_event: string;
+};
+
+type BattleEvent = {
+  id: number;
+  event_type: string;
+  payload: { damage?: number; absorbed?: number; reason?: string };
+  created_at: string;
 };
 
 type SearchState = "idle" | "searching" | "matched" | "error";
@@ -38,6 +49,7 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
   const [match, setMatch] = useState<MatchResult | null>(null);
   const [readyState, setReadyState] = useState<ReadyResult | null>(null);
   const [battleState, setBattleState] = useState<BattleState | null>(null);
+  const [battleEvents, setBattleEvents] = useState<BattleEvent[]>([]);
   const [readyLoading, setReadyLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -90,8 +102,19 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
     if (result) setReadyState(result);
   }
 
-  async function performAction(action: "sync" | "mine" | "emp_strike") {
-    if (!supabase || !match?.match_id || actionLoading) return;
+  async function refreshEvents() {
+    if (!supabase || !match?.match_id) return;
+    const { data, error } = await supabase
+      .from("ranked_match_events")
+      .select("id,event_type,payload,created_at")
+      .eq("match_id", match.match_id)
+      .order("id", { ascending: false })
+      .limit(8);
+    if (!error && data) setBattleEvents(data as BattleEvent[]);
+  }
+
+  async function performAction(action: BattleAction) {
+    if (!supabase || !match?.match_id || (action !== "sync" && actionLoading)) return;
     if (action !== "sync") setActionLoading(true);
     const { data, error } = await supabase.rpc("perform_ranked_action", {
       p_match_id: match.match_id,
@@ -109,6 +132,7 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
         setReadyState((previous) => previous ? { ...previous, match_status: result.match_status } : previous);
       }
       if (action !== "sync") setErrorMessage("");
+      if (result.match_status === "completed") void refreshEvents();
     }
   }
 
@@ -118,7 +142,11 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
   useEffect(() => {
     if (!battleStarted || !match?.match_id) return;
     void performAction("sync");
-    const timer = window.setInterval(() => { void performAction("sync"); }, 2000);
+    void refreshEvents();
+    const timer = window.setInterval(() => {
+      void performAction("sync");
+      void refreshEvents();
+    }, 2000);
     return () => window.clearInterval(timer);
   }, [battleStarted, match?.match_id]);
 
@@ -126,12 +154,23 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
     setMatch(null);
     setReadyState(null);
     setBattleState(null);
+    setBattleEvents([]);
     setErrorMessage("");
     void checkForMatch();
   }
 
   const formatTime = (seconds: number) =>
     `${Math.floor(seconds / 60).toString().padStart(2, "0")}:${(seconds % 60).toString().padStart(2, "0")}`;
+
+  const eventLabel = (event: string) => ({
+    match_started: "⚔️ Battle started",
+    mine: "⛏️ Mining operation",
+    emp_strike: "⚡ EMP Strike",
+    golden_shield: "🛡️ Golden Shield activated",
+    robot_raid: "🤖 Robot Raid",
+    ultimate_overdrive: "🔥 Ultimate Overdrive",
+    match_completed: "🏆 Match completed",
+  }[event] || event.replaceAll("_", " "));
 
   const own = battleState?.own_state;
   const opponent = battleState?.opponent_state;
@@ -179,17 +218,32 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
             <div><span>ENEMY BASE</span><strong>{opponent?.base_health ?? 1000}</strong></div>
           </div>
           <p>Energy: {Math.floor(own?.energy ?? 100)} / 100 · Ultimate: {Math.floor(own?.ultimate ?? 0)} / 100 · Gold: {own?.gold ?? 0}</p>
+          <p>Your shield: {own?.shield ?? 0} · Enemy shield: {opponent?.shield ?? 0}</p>
           {!completed ? (
             <div className="ranked-battle-actions">
-              <button className="ranked-search-button" onClick={() => void performAction("mine")} disabled={actionLoading}>
-                {actionLoading ? "PROCESSING..." : "MINE +15 GOLD"}
-              </button>
-              <button className="ranked-search-button" onClick={() => void performAction("emp_strike")} disabled={actionLoading}>
-                EMP STRIKE · 35 ENERGY + 25 ULT
-              </button>
+              <button className="ranked-search-button" onClick={() => void performAction("mine")} disabled={actionLoading}>⛏️ MINE +15 GOLD · 10 ENERGY</button>
+              <button className="ranked-search-button" onClick={() => void performAction("emp_strike")} disabled={actionLoading}>⚡ EMP STRIKE · 35 ENERGY + 25 ULT</button>
+              <button className="ranked-search-button" onClick={() => void performAction("golden_shield")} disabled={actionLoading}>🛡️ GOLDEN SHIELD · 25 ENERGY</button>
+              <button className="ranked-search-button" onClick={() => void performAction("robot_raid")} disabled={actionLoading}>🤖 ROBOT RAID · 40 ENERGY + 20 ULT</button>
+              <button className="ranked-search-button ranked-ultimate-button" onClick={() => void performAction("ultimate")} disabled={actionLoading || (own?.ultimate ?? 0) < 100}>🔥 ULTIMATE OVERDRIVE · 100 CHARGE</button>
             </div>
           ) : (
-            <p>{battleState.winner_id ? battleState.winner_id === match?.opponent_id ? "Opponent wins." : "You win!" : "Draw — equal result."}</p>
+            <>
+              <p>{battleState.winner_id ? "Winner: " + (battleState.winner_id === match?.opponent_id ? "Opponent" : "You") : "Draw — equal result."}</p>
+              <p>Ranked points: {battleState.own_rp_change > 0 ? "+" : ""}{battleState.own_rp_change} RP</p>
+            </>
+          )}
+          {battleEvents.length > 0 && (
+            <div className="ranked-event-log">
+              <strong>BATTLE LOG</strong>
+              {battleEvents.map((event) => (
+                <div className="ranked-event-row" key={event.id}>
+                  <span>{eventLabel(event.event_type)}</span>
+                  {typeof event.payload?.damage === "number" && <small>{event.payload.damage} damage</small>}
+                  {typeof event.payload?.absorbed === "number" && event.payload.absorbed > 0 && <small>{event.payload.absorbed} blocked</small>}
+                </div>
+              ))}
+            </div>
           )}
         </div>
       )}
@@ -213,7 +267,7 @@ export default function RankedArena({ authStatus }: MatchmakingProps) {
       </button>
 
       {authStatus !== "online" && <div className="notice-card">Your online profile must be connected to enter Ranked matchmaking.</div>}
-      <div className="notice-card">Ranked matches, readiness, resource regeneration, mining, EMP damage and victory checks are server-authoritative. This is the first playable combat loop; more abilities and defense systems will follow.</div>
+      <div className="notice-card">Ranked combat now includes server-validated mining, EMP, Golden Shield, Robot Raid, Ultimate Overdrive, event history and one-time RP settlement.</div>
     </section>
   );
 }
